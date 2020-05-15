@@ -8,15 +8,11 @@ categories: [C++,unity]
 
 # C# IEnumerable和IEnumeartor详解
 
-[C#图解教程]: https://www.cnblogs.com/moonache/p/7687551.html
+[C#图解教程](https://www.cnblogs.com/moonache/p/7687551.html )
 
+[C#图解教程：枚举器和迭代器](https://www.cnblogs.com/moonache/p/6548043.htm )
 
-
-[C#图解教程：枚举器和迭代器]: https://www.cnblogs.com/moonache/p/6548043.html
-
-
-
-[参考网址：https://blog.csdn.net/byondocean/article/details/6871881]: https://blog.csdn.net/byondocean/article/details/6871881
+[参考网址](https://blog.csdn.net/byondocean/article/details/6871881 )
 
 
 
