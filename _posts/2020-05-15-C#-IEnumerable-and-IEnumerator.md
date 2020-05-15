@@ -30,7 +30,7 @@ categories: [C++,unity]
 
 
 
-![](/home/android/桌面/GitTest/MonkeyGamerPan.github.io/assets/img/resources/IEnumerable-and-IEnumerator-1.jpg)
+![](../assets/img/resources/IEnumerable-and-IEnumerator-1.jpg)
 
 
 
@@ -80,7 +80,7 @@ namespace
 
 
 
-![](/home/android/桌面/GitTest/MonkeyGamerPan.github.io/assets/img/resources/IEnumerable-and-IEnumerator-2.jpg)
+![](../assets/img/resources/IEnumerable-and-IEnumerator-2.jpg)
 
 ​	枚举器与序列中的当前项保持联系的方式完全取决于实现。可以通过对象引用、索引值或其他方式来实现。对于内置的一维数组来说，就是用项的索引。
 
@@ -105,7 +105,7 @@ static void Main()
 
 
 
-![](/home/android/桌面/GitTest/MonkeyGamerPan.github.io/assets/img/resources/IEnumerable-and-IEnumerator-4.jpg)
+![](../assets/img/resources/IEnumerable-and-IEnumerator-4.jpg)
 
 
 
@@ -223,7 +223,7 @@ class Program
   ​		而*泛型接口*的枚举器是类型安全的，它返回实际类型的引用。如果要创建自己的可枚举类，应该实现这些泛型接口。非泛型版本可用于C#2.0以前没有泛型的遗留代码。
   尽管泛型版本和非泛型版本一样简单易用，但其结构略显复杂。
 
-![](/home/android/桌面/GitTest/MonkeyGamerPan.github.io/assets/img/resources/IEnumerable-and-IEnumerator-6.jpg)
+![](../assets/img/resources/IEnumerable-and-IEnumerator-6.jpg)
 
 
 
@@ -279,7 +279,7 @@ public IEnumerator<string> BlackAndWhite()
 编译器得到有关枚举项的描述后，使用它来构建包含所有需要的方法和属性实现的枚举器类。结果类被嵌套包含在迭代器声明的类中。
 如下图所示，根据迭代器块的返回类型，你可以让迭代器产生枚举器或可枚举类型。
 
-![](/home/android/桌面/GitTest/MonkeyGamerPan.github.io/assets/img/resources/IEnumerable-and-IEnumerator-8.jpg)
+![](../assets/img/resources/IEnumerable-and-IEnumerator-8.jpg)
 
 
 
@@ -323,7 +323,7 @@ class Program
 - 图左的迭代器代码演示了它的返回类型是IEnumerator
 - 图右演示了它有一个嵌套类实现了IEnumerator<T>
 
-![](/home/android/桌面/GitTest/MonkeyGamerPan.github.io/assets/img/resources/IEnumerable-and-IEnumerator-9.jpg)
+![](../assets/img/resources/IEnumerable-and-IEnumerator-9.jpg)
 
 
 
@@ -372,7 +372,7 @@ class Program
 
 下图演示了在代码的可枚举迭代器产生泛型可枚举类型。
 
-![](/home/android/桌面/GitTest/MonkeyGamerPan.github.io/assets/img/resources/IEnumerable-and-IEnumerator-10.jpg)
+![](../assets/img/resources/IEnumerable-and-IEnumerator-10.jpg)
 
 ### 常见迭代器模式
 
@@ -385,7 +385,7 @@ class Program
   - 若实现GetEnumerator，让它调用迭代器方法以获取自动生成的实现IEnumerable的类实例。然后从IEnumerable对象返回由GetEnumerator创建的枚举器，如图右
   - 若通过不实现GetEnumerator使类本身不可枚举，仍然可以使用由迭代器返回的可枚举类，只需要直接调用迭代器方法，如果右第二个foreach语句
 
-![](/home/android/桌面/GitTest/MonkeyGamerPan.github.io/assets/img/resources/IEnumerable-and-IEnumerator-11.jpg)
+![](../assets/img/resources/IEnumerable-and-IEnumerator-11.jpg)
 
 
 
@@ -520,4 +520,4 @@ class Program
 - After 没有更多项可以枚举
 
 如果状态机在Before或Suspended状态时调用MoveNext方法，就转到了Running状态。在Running状态中，它检测集合的下一项并设置位置。
-如果有更多项，状态机会转入Suspended状态，如果没有更多项，它转入并保持在After状态。![](/home/android/桌面/GitTest/MonkeyGamerPan.github.io/assets/img/resources/IEnumerable-and-IEnumerator-12.jpg)
+如果有更多项，状态机会转入Suspended状态，如果没有更多项，它转入并保持在After状态。![](../assets/img/resources/IEnumerable-and-IEnumerator-12.jpg)
