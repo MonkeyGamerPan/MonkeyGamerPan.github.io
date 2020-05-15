@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "C# IEnumerable和IEnumeartor详解"
-featured-img: shane-rounce-205187
-categories: [C#][unity]
+title: C# IEnumrable和IEnumerator详解
+featured-img: sleek
+categories: [C++,unity] 
 ---
 
 
