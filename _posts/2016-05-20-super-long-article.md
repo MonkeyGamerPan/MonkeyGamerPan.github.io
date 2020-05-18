@@ -10,3 +10,11 @@ categories: [unity, address]
 
 
 [unity高清渲染管线入门指南](https://connect.unity.com/p/gao-qing-xi-xuan-ran-guan-xian-hdrpru-men-zhi-nan)
+
+
+
+[unity使用shader graph 制作溶解特效](https://connect.unity.com/p/li-yong-shadergraphzhao-se-qi-shi-tu-shi-xian-xuan-ku-de-wu-ti-xiao-rong-te-xiao)
+
+
+
+[unity shader graph Position节点解析](https://www.bilibili.com/read/cv3585934/)
