@@ -11,37 +11,11 @@ categories: [C++,unity]
 
 
 
-
-
-
-[C#图解教程](https://www.cnblogs.com/moonache/p/7687551.html )
-
-[C#图解教程：枚举器和迭代器](https://www.cnblogs.com/moonache/p/6548043.html)
-
-[参考网址](https://blog.csdn.net/byondocean/article/details/6871881 )
-
-
-
-
-
-
-
-
-
 ## 1、foreach
 
 ​		在数组中，foreach语句为我们依次取出数组中的每个元素。
 
 ​		为什么数组可以这么做？因为数组可以按需提供一个叫做枚举器（enumerator）的对象。枚举器可以依次返回请求的数组中的元素。枚举器“知道”项的次序并且跟踪它在序列中的位置，然后返回请求的当前项。
-
-
-
-
-
-
-
-
-
 
 
 ​		对于由枚举器的类型，必须有一个方法来获取它。获取对象枚举器的方法是调用对象的GetEnumerator方法。实现GetEnumerator（）方法的类型叫做*可枚举类型*（enumerable type或enumerable）。数组是可枚举类型。
@@ -539,3 +513,12 @@ class Program
 
 如果状态机在Before或Suspended状态时调用MoveNext方法，就转到了Running状态。在Running状态中，它检测集合的下一项并设置位置。
 如果有更多项，状态机会转入Suspended状态，如果没有更多项，它转入并保持在After状态。![](../assets/img/resources/IEnumerable-and-IEnumerator-12.jpg)
+
+
+
+#参考文献：
+[C#图解教程](https://www.cnblogs.com/moonache/p/7687551.html )
+
+[C#图解教程：枚举器和迭代器](https://www.cnblogs.com/moonache/p/6548043.html)
+
+[参考网址](https://blog.csdn.net/byondocean/article/details/6871881 )
