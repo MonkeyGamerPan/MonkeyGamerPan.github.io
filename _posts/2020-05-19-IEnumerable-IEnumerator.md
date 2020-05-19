@@ -1,14 +1,9 @@
 ---
 layout: post
-title: Unity Mathf 数学运算
+title: C# IEnumerable和IEnumerator详解
 featured-img: sleek
-categories: [Mathf,unity] 
+categories: [C#,unity] 
 ---
----
-layout: post
-title: C# IEnumrable和IEnumerator详解
-featured-img: sleek
-categories: [C++,unity] 
 ---
 #### foreach
 在数组中，foreach语句为我们依次取出数组中的每个元素。为什么数组可以这么做？因为数组可以按需提供一个叫做枚举器（enumerator）的对象。枚举器可以依次返回请求的数组中的元素。枚举器“知道”项的次序并且跟踪它在序列中的位置，然后返回请求的当前项。对于由枚举器的类型，必须有一个方法来获取它。获取对象枚举器的方法是调用对象的GetEnumerator方法。实现GetEnumerator（）方法的类型叫做*可枚举类型*（enumerable type或enumerable）。数组是可枚举类型。
