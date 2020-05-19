@@ -21,9 +21,48 @@ categories: [C++]
 
 
 
-#### 3、C++中的status_t的含义；   
+#### 3、C++中的 struct stat sb的含义  
 
-​	在Errors.h中定义的：// use this type to return error codestypedef int32_t status_t;
+​	在c++中，struct stat sb这个结构是用来描述一个linux系统文件中的文件属性的结构。 stat 函数获取文件的所有相关信息，一般情况下，我们关心的文件大小和创建时间、访问时间、修改时间。
+
+##### 	1、struct stat 结构体介绍
+
+​	首先是用到struct stat结构体的函数原型：
+
+```C++
+int stat(const char *path, struct stat *buf);
+int lstat(const char *path, struct stat *buf);
+int fstat(int filedes, struct stat *buf);
+```
+
+​	三个函数返回关于文件的信息。前两个函数的第一个参数都是文件的全路径，第二个参数是struct stat的指针。返回值为0，表示成功执行。最后一个函数的第一个参数一个“文件描述符”，文件描述符是需要我们用open系统调用后才能得到的，而全文件路径直接写就可以了。
+
+​	stat和lstat的区别：当文件是一个符号链接时，lstat返回的是该符号链接本身的信息；而stat返回的是该链接指向的文件的信息。（似乎有些晕吧，这样记，lstat比stat多了一个l，因此它是有本事处理符号链接文件的，因此当遇到符号链接文件时，lstat当然不会放过。而 stat系统调用没有这个本事，它只能对符号链接文件睁一只眼闭一只眼，直接去处理链接所指文件喽）
+
+​	struc stat信息如下：
+
+```C++
+struct stat {
+
+        mode_t     st_mode;       //文件对应的模式，文件，目录等
+        ino_t      st_ino;       //inode节点号
+        dev_t      st_dev;        //设备号码
+        dev_t      st_rdev;       //特殊设备号码
+        nlink_t    st_nlink;      //文件的连接数
+        uid_t      st_uid;        //文件所有者
+        gid_t      st_gid;        //文件所有者对应的组
+        off_t      st_size;       //普通文件，对应的文件字节数
+        time_t     st_atime;      //文件最后被访问的时间
+        time_t     st_mtime;      //文件内容最后被修改的时间
+        time_t     st_ctime;      //文件状态改变时间
+        blksize_t st_blksize;    //文件内容对应的块大小
+        blkcnt_t   st_blocks;     //文件内容对应的块数量
+      };
+```
+
+
+
+
 
 
 
