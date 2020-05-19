@@ -4,9 +4,8 @@ title: C# IEnumrable和IEnumerator详解
 featured-img: sleek
 categories: [C++,unity] 
 ---
-### C# IEnumerable和IEnumeartor详解
-#### 1、foreach
-​在数组中，foreach语句为我们依次取出数组中的每个元素。为什么数组可以这么做？因为数组可以按需提供一个叫做枚举器（enumerator）的对象。枚举器可以依次返回请求的数组中的元素。枚举器“知道”项的次序并且跟踪它在序列中的位置，然后返回请求的当前项。对于由枚举器的类型，必须有一个方法来获取它。获取对象枚举器的方法是调用对象的GetEnumerator方法。实现GetEnumerator（）方法的类型叫做*可枚举类型*（enumerable type或enumerable）。数组是可枚举类型。
+#### foreach
+在数组中，foreach语句为我们依次取出数组中的每个元素。为什么数组可以这么做？因为数组可以按需提供一个叫做枚举器（enumerator）的对象。枚举器可以依次返回请求的数组中的元素。枚举器“知道”项的次序并且跟踪它在序列中的位置，然后返回请求的当前项。对于由枚举器的类型，必须有一个方法来获取它。获取对象枚举器的方法是调用对象的GetEnumerator方法。实现GetEnumerator（）方法的类型叫做*可枚举类型*（enumerable type或enumerable）。数组是可枚举类型。
 
 ![](../assets/img/resources/IEnumerable-and-IEnumerator-1.jpg)
 
@@ -14,7 +13,7 @@ foreach结构设计用来和可枚举类型一起使用。只要给它的遍历�
 - 调用GetEnumerator获取对象枚举器
 - 从枚举器中请求每一项并且把它作为迭代变量（iteration variable），**代码可以读取该变量但不能改变**
 
-### 2、IEnumerator接口
+#### IEnumerator接口
 
 ```c#
 namespace
@@ -82,7 +81,7 @@ static void Main()
 
 
 
-### 3、IEnumerable接口
+#### IEnumerable接口
 
 可枚举类是指实现了IEnumerable接口的类。IEnumerable接口只有一个成员–GetEnumerator方法，它返回对象的枚举器（IEnumerator对象）。
 
@@ -103,7 +102,7 @@ namespace
 
 
 
-### 4、使用IEnumerable和IEnumerator的示例
+#### 使用IEnumerable和IEnumerator的示例
 
 下面是个可枚举类的完整示例，类名Spectrum，枚举器类为ColorEnumerator。
 
@@ -173,7 +172,7 @@ class Program
 
 
 
-### 5、泛型枚举接口
+#### 泛型枚举接口
 
 ​		目前我们描述的枚举接口都是非泛型版本。实际上，在大多数情况下你应该使用泛型版本IEnumerable<T>和IEnumerator<T>。它们叫做泛型是因为使用了C#泛型（参见第17章），其使用方法和非泛型形式差不多。
 两者间的本质差别如下：
@@ -200,7 +199,7 @@ class Program
 
 
 
-### 6、迭代器
+#### 迭代器
 
 ​	可枚举类和枚举器在.NET集合类中被广泛使用，所以熟悉它们如何工作很重要。不过，虽然我们已经知道如何创建自己的可枚举类和枚举器了，但我们还是很高兴听到，C#从2.0版本开始提供了更简单的创建枚举器和可枚举类型的方式。
 ​	实际上，编译器将为我们创建它们。这种结构叫做*迭代器*（iterator）。我们可以把手动编码的可枚举类型和枚举器替换为由迭代器生成的可枚举类型和枚举器。
