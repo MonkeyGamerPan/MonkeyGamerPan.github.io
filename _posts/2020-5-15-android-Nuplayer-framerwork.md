@@ -45,7 +45,7 @@ DataSource有两个概念：
 
 VideoTrack与AudioTrack指的是Extractor（即demux）的两个通道，从这里输出的分别就是单纯的解复用后的Video和Audio流。再经过Decoder后输出的就是音、视频的输出了：
 
-- VideoRenderer + Surface即视频的输出；
+- VideoRenderer + Surface即视频的输出；	
 - AudioSink即音频的输出；
 
 
