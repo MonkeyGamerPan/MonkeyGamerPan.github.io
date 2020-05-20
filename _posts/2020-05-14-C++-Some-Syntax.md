@@ -19,6 +19,22 @@ categories: [C++]
 
 
 
+#### C++中CHECK_EQ等函数的用法
+
+  CHECK_EQ(x,y)<<"x!=y"，EQ即equation，意为“等于”，函数判断是否x等于y，当x!=y时，函数打印出x!=y。
+
+  CHECK_NE(x,y)<<"x=y"，NE即not equation，意为“不等于”，函数判断是否x不等于y，当x=y时，函数打印出x=y。
+
+  CHECK_LE(x,y) <<"x<=y",LE即lower equation,意为小于等于，函数判断是否x小于等于y。当x<=y时，函数打印x<=y。
+
+  CHECK_LT(x,y)<<"x<=y",LT即为lower to ，意为小于，函数判断是否x小于y，当x<y时，函数打印x<y。
+
+  CHECK_GE(x,y) <<"x>=y",GE即为great equation，意为大于。判断意义根据上述可推导出。
+
+  CHECK_GT(x,y) <<"x>=y",同理如上。
+
+
+
 #### C++中explicit关键字的用法
 
 ​	在C++中，我们有时候可以将构造函数用作自动类型转换函数。但是这种自动转换属性并非总是合乎要求的，有时会导致意外的类型转换。因此，C++新增了关键字explicit，用于关闭这种自动特性。即被explicit关键字修饰的类构造函数，不能进行自动地隐式类型转换，只能显式地尽心类型转换。
