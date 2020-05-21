@@ -56,13 +56,9 @@ VideoTrack与AudioTrack指的是Extractor（即demux）的两个通道，从这�
 
 [Nuplayer类源码分析](/android-Nuplayer-code)
 
-
-
 [NuplayerDriver类源码分析](/android-NuplayerDriver-code)
 
-
-
-
+[GenericSource类源码分析](/android-GenericSource-code)
 
 
 

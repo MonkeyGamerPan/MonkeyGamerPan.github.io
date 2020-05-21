@@ -19,6 +19,34 @@ categories: [C++]
 
 
 
+#### C++中枚举类型没有定义类型名称
+
+例如：
+
+```c++
+enum {
+    STATION_IDLE = 0,
+    STATION_CONNECTING,
+    STATION_WRONG_PASSWORD,
+    STATION_NO_AP_FOUND,
+    STATION_CONNECT_FAIL,
+    STATION_GOT_IP
+}；
+```
+
+没有定义类型名称的枚举类型，相当于使用\#define定义了名称以及值。
+
+```c++
+#define     STATION_IDLE = 0;
+#define     STATION_CONNECTING = 1;
+#define     STATION_WRONG_PASSWORD = 2;
+#define     STATION_NO_AP_FOUND = 3;
+#define     STATION_CONNECT_FAIL = 4;
+#define     STATION_GOT_IP = 5;
+```
+
+
+
 #### C++中CHECK_EQ等函数的用法
 
   CHECK_EQ(x,y)<<"x!=y"，EQ即equation，意为“等于”，函数判断是否x等于y，当x!=y时，函数打印出x!=y。
