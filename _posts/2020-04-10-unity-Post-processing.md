@@ -35,9 +35,7 @@ categories: [unity, Post-processing]
 
 
 
-
-
-![](/home/android/桌面/GitTest/MonkeyGamerPan.github.io/assets/img/resources/PostProcessing-AmbientOcclusion-1.jpg)
+![](../assets/img/resources/PostProcessing-AmbientOcclusion-1.jpg)
 
 ​	前一张图片是没有使用环境光遮蔽后处理效果的，而后一张相反，可以看出后一张图片中的在墙角、孔洞、柱子底部等地方明显变得更暗。
 
