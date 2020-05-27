@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "C++各中知识点"
-featured-img: shane-rounce-205187
+featured-img: emile-perron-190221
 categories: [C++]
 ---
 

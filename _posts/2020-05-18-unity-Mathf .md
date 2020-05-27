@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Unity Mathf 数学运算
-featured-img: sleek
+featured-img: shane-rounce-205187
 categories: [Mathf,unity] 
 ---
 **Mathf.Abs绝对值**
