@@ -30,3 +30,7 @@ categories: [unity, address]
 
 
 [unity 社区connect](https://connect.unity.com)
+
+
+
+[unity AssetBundle讲解](https://blog.csdn.net/qq_35361471/article/details/82854560#1_AssetBundle_3)
