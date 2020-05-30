@@ -77,12 +77,19 @@ categories: [unity, CG]
 ## 常用语义修饰
 
 1:POSITION : 位置
+
 2:TANGENT : 切线
+
 3: NORMAL: 法线
+
 4: TEXCOORD0: 第一套纹理
+
 5: TEXCOORD1: 第二套纹理
+
 6: TEXCOORD2: 第三套纹理
+
 7: TEXCOORD3: 第四套纹理
+
 8: COLOR: 颜色
 
 
@@ -92,20 +99,35 @@ categories: [unity, CG]
 ## 标准内置函数
 
 1:abs(num)绝对值;
+
 2: 三角函数;
+
 3: cross(a, b) 两个向量的叉积;
+
 4: determinant(M)矩阵的行列式;
+
 5: dot(a, b) 两个向量的点积;
+
 6: floor(x)向下取整;
+
 7: lerp(a, b, f), 在a, b之间线性插值;
+
 8: log2(x) 基于2为底的x的对数;
+
 9: mul(m, n): 矩阵x矩阵, 矩阵x向量, 向量x矩阵;
+
 10: power(x, y) x的y次方;
+
 11: radians(x) 度转弧度;
+
 12: reflect(v, n) v 关于法线n的反射向量;
+
 13: round(x) 靠近取整;
+
 14: tex2D(smapler, x) 二维纹理查找
+
 15: tex3Dproj(smapler, x) 投影三维纹理查找;
+
 16: texCUBE 立方体贴图纹理查找;
 
  
@@ -115,9 +137,11 @@ categories: [unity, CG]
 ## Unity自带函数
 
 1: 引用Unity自带的函数库: #include “UnityCG.cginc” Unity-->Edit-->Data-->CGIncludes;
+
 2: TRANSFORM_TEX: 根据顶点的纹理坐标，计算出对应的纹理的真正的UV坐标;
-3: 使用属性的变量: 在shader里面需要使用属性变量还需要在shader中定义一下这个变量的类型和名字;
-名字要保持一致;
+
+3: 使用属性的变量: 在shader里面需要使用属性变量还需要在shader中定义一下这个变量的类型和名字;名字要保持一致;
+
 4: 外部修改shader的编辑器上的参数值;
 
  
