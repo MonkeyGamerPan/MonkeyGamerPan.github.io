@@ -112,29 +112,90 @@ float4 modelPos = mul(viewPos, UNITY_MATRIX_IT_MV);
 
 
 
+## unity内置函数
 
+​	在计算光照模型的时候，我们往往需要得到光源方向、视角方向这两个基本信息。在上面的例子中，我们都是自行在代码里计算的，例如使用normalize(_WorldSpace LightPos0.xyz)来得到光源方向（这种方法实际只适用于平行光），使用normalize(_WorldSpace CameraPos.xyz - i.worldPosition.xyz)来得到视角方向。但如果需要处理更复杂的光照类型，如点光源和聚光灯，我们计算光源方向的方法就是错误的。这需要我们在代码中先判断光源类型，再计算它的光源信息。
 
+​	手动计算这些光源信息的过程相对比较麻烦（但并不意味着你不需要了解它们的原理）。幸运的是，Unity提供了一些内置函数来帮助我们计算这些信息。如下表所示：
 
+|                    函数名                     |                             描述                             |
+| :-------------------------------------------: | :----------------------------------------------------------: |
+|      float3 WorldSpaceViewDir (float4 v)      | 输入一个模型空间中的顶点位置，返回世界空间中从该点到摄像机的观察方向。内部实现使用了UnityWorldSpaceViewDir函数 |
+|   float3 UnityWorldSpaceViewDir (float4 v)    | 输入一个世界空间中的顶点位置，返回世界空间中从该点到摄像机的观察方向 |
+|       float3 ObjSpaceViewDir (float4 v)       | 输入一个模型空间中的顶点位置，返回模型空间中从该点到摄像机的观察方向 |
+|     float3 WorldSpaceLightDir (float4 v)      | 仅可用于前向渲染中 。输入一个模型空间中的顶点位置，返回世界空间中从该点到光源的光照方向。内部实现使用了UnityWorldSpaceLightDir函数。没有被归一化 |
+|   float3 UnityWorldSpaceLightDir (float4 v)   | 仅可用于前向渲染中 。输入一个世界空间中的顶点位置，返回世界空间中从该点到光源的光照方向。没有被归一化 |
+|      float3 ObjSpaceLightDir (float4 v)       | 仅可用于前向渲染中 。输入一个模型空间中的顶点位置，返回模型空间中从该点到光源的光照方向。没有被归一化 |
+| float3 UnityObjectToWorldNormal (float3 norm) |             把法线方向从模型空间转换到世界空间中             |
+|   float3 UnityObjectToWorldDir (float3 dir)   |             把方向矢量从模型空间变换到世界空间中             |
+|   float3 UnityWorldToObjectDir(float3 dir)    |             把方向矢量从世界空间变换到模型空间中             |
 
+注意，类似UnityXXX的几个函数是Unity 5中新添加的内置函数。这些帮助函数使得我们不需要跟各种变换矩阵、内置变量打交道，也不需要考虑各种不同的情况（例如使用了哪种光源），而仅仅调用一个函数就可以得到需要的信息。上面的9个帮助函数中，有5个我们已经掌握了其内部实现，例如WorldSpaceViewDir函数实现如下：
 
+```c
+// Computes world space view direction, from object space position
+inline float3 UnityWorldSpaceViewDir( in float3 worldPos )
+{
+    return _WorldSpaceCameraPos.xyz - worldPos;
+}
+```
 
+可以看出，这与之前计算视角方向的方法一致。需要注意的是，这些函数都没有保证得到的方向矢量是单位矢量，因此，我们需要在使用前把它们归一化。
 
+而计算光源方向的3个函数：WorldSpaceLightDir、UnityWorldSpaceLightDir和ObjSpace
+LightDir，稍微复杂一些，这是因为，Unity帮我们处理了不同种类光源的情况。需要注意的是，这3个函数仅可用于前向渲染（关于什么是前向渲染会在9.1节中讲到）。这是因为只有在前向渲染时，这3个函数里使用的内置变量_WorldSpaceLightPos0等才会被正确赋值。关于哪些内置变量只会在前向渲染中被正确赋值，可以参见9.1.1节。
 
+下面介绍使用内置函数改写Unity Shader。
 
+我们已经在本节涉及了过多的细节，如果读者无法理解所有内容的话，只需要知道，在实际编写过程中，我们往往会借助于Unity的内置函数来帮助我们进行各种计算，这可以减轻不少我们的“痛苦”。
 
+下面，我们将使用这些内置函数来改写6.5.3小节中使用Blinn-Phong光照模型的Unity Shader。为此。
 
+（1）在Unity中新建一个场景。在本书资源中，该场景名为Scene_6_6。在Unity 5.2中，默认情况下场景将包含一个摄像机和一个平行光，并且使用了内置的天空盒子。在Window -> Lighting -> Skybox中去掉场景中的天空盒子。
 
+（2）新建一个材质。在本书资源中，该材质名为BlinnPhongUseBuildInFunctionMat。
 
+（3）新建一个Unity Shader。在本书资源中，该Shader名为Chapter6-BlinnPhongUseBuildIn unction。把新的Shader赋给第2步中创建的材质。
 
+（4）创建一个胶囊体，并把第2步中创建的材质赋给它。
 
+Chapter6-BlinnPhongUseBuildInFunction中的代码几乎和Chapter6-BlinnPhong中的完全一样，只是计算时使用了Unity的内置函数。修改部分的代码如下：
 
+（1）在顶点着色器中，我们使用内置的UnityObjectToWorldNormal函数来计算世界空间下的法线方向：
 
+```c
+v2f vert(a2v v) {
+    v2f o;
+    ...
+    // Use the build-in function to compute the normal in world space
+    o.worldNormal = UnityObjectToWorldNormal(v.normal);
+    ...
+    return o;
+}
+```
 
+（2）在片元着色器中，我们使用内置的UnityWorldSpaceLightDir函数和UnityWorldSpaceView
+Dir函数来分别计算世界空间的光照方向和视角方向：
 
+```c
+fixed4 frag(v2f i) : SV_Target {
+    ...
 
+    fixed3 worldNormal = normalize(i.worldNormal);
+    //  Use the build-in function to compute the light direction in world space
+    // Remember to normalize the result
+    fixed3 worldLightDir = normalize(UnityWorldSpaceLightDir(i.worldPos));
 
+    ...
 
+    // Use the build-in function to compute the view direction in world space
+    // Remember to normalize the result
+    fixed3 viewDir = normalize(UnityWorldSpaceViewDir(i.worldPos));
+    ...
+}
+```
 
+​	需要注意的是，由内置函数得到的方向是没有归一化的，因此我们需要使用normalize函数来对结果进行归一化，再进行光照模型的计算。
 
 
 
