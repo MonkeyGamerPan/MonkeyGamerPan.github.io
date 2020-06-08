@@ -9,21 +9,26 @@ categories: [unity, shader]
 
 
 
+
+
+
+
 ## 变换矩阵
 
 ​	首先是用于坐标空间变换的矩阵。下表给出了Unity 5.2版本提供的所有内置变换矩阵。下面所有的矩阵都是float4x4类型的。
 
-|       变量名       |                             描述                             |
-| :----------------: | :----------------------------------------------------------: |
-|  UNITY_MATRIX_MVP  | 当前的模型观察投影矩阵，用于将顶点/方向矢量从模型空间变换到裁剪空间 |
-|  UNITY_MATRIX_MV   | 当前的模型观察矩阵，用于将顶点/方向矢量从模型空间变换到观察空间 |
-|   UNITY_MATRIX_V   | 当前的观察矩阵，用于将顶点/方向矢量从世界空间变换到观察空间  |
-|   UNITY_MATRIX_P   | 当前的投影矩阵，用于将顶点/方向矢量从观察空间变换到裁剪空间  |
-|  UNITY_MATRIX_VP   | 当前的观察投影矩阵，用于将顶点/方向矢量从世界空间变换到裁剪空间 |
-| UNITY_MATRIX_T_MV  |                  UNITY_MATRIX_MV的转置矩阵                   |
-| UNITY_MATRIX_IT_MV | UNITY_MATRIX_MV的逆转置矩阵，用于将法线从模型空间变换到观察空间，也可用于得到UNITY_MATRIX_MV的逆矩阵 |
-|   _Object2World    | 当前的模型矩阵，用于将顶点/方向矢量从模型空间变换到世界空间  |
-|   _World2Object    | _Object2World的逆矩阵，用于将顶点/方向矢量从世界空间变换到模型空间 |
+|                     变量名                      |                             描述                             |
+| :---------------------------------------------: | :----------------------------------------------------------: |
+|                UNITY_MATRIX_MVP                 | 当前的模型观察投影矩阵，用于将顶点/方向矢量从模型空间变换到裁剪空间 |
+|                 UNITY_MATRIX_MV                 | 当前的模型观察矩阵，用于将顶点/方向矢量从模型空间变换到观察空间 |
+|                 UNITY_MATRIX_V                  | 当前的观察矩阵，用于将顶点/方向矢量从世界空间变换到观察空间  |
+|                 UNITY_MATRIX_P                  | 当前的投影矩阵，用于将顶点/方向矢量从观察空间变换到裁剪空间  |
+|                 UNITY_MATRIX_VP                 | 当前的观察投影矩阵，用于将顶点/方向矢量从世界空间变换到裁剪空间 |
+|                UNITY_MATRIX_T_MV                |                  UNITY_MATRIX_MV的转置矩阵                   |
+|               UNITY_MATRIX_IT_MV                | UNITY_MATRIX_MV的逆转置矩阵，用于将法线从模型空间变换到观察空间，也可用于得到UNITY_MATRIX_MV的逆矩阵 |
+|                  _Object2World                  | 当前的模型矩阵，用于将顶点/方向矢量从模型空间变换到世界空间  |
+|                  _World2Object                  | _Object2World的逆矩阵，用于将顶点/方向矢量从世界空间变换到模型空间 |
+| TANGENT_SPACE_ROTATION（在UnityCG.cginc中被定义 |                将变量从模型空间变换到切线空间                |
 
 
 
@@ -46,6 +51,8 @@ float4 modelPos = mul(viewPos, UNITY_MATRIX_IT_MV);
 
 
 
+
+
 ## 摄像机和屏幕参数
 
 |             变量名             |   类型   |                             描述                             |
@@ -58,6 +65,10 @@ float4 modelPos = mul(viewPos, UNITY_MATRIX_IT_MV);
 |     unity_CameraProjection     | float4x4 |                      该摄像机的投影矩阵                      |
 |    unity_CameraInvProjectio    | float4x4 |                  该摄像机的投影矩阵的逆矩阵                  |
 | unity_CameraWorldClipPlanes[6] | float4x4 | 该摄像机的6个裁剪平面在世界空间下的等式，按如下顺序：左、右、下、上、近、远裁剪平面 |
+
+
+
+
 
 
 
@@ -107,6 +118,10 @@ float4 modelPos = mul(viewPos, UNITY_MATRIX_IT_MV);
 | 语　　义  |                           描　　述                           |
 | :-------: | :----------------------------------------------------------: |
 | SV_Target | 输出值将会存储到渲染目标（render target）中。等同于DirectX 9中的COLOR语义，但最好使用SV_Target |
+
+
+
+
 
 
 
