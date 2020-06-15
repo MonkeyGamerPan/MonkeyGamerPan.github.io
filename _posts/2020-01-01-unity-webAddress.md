@@ -5,6 +5,12 @@ featured-img: shane-rounce-205187
 categories: [unity, address]
 ---
 
+unity中随机生成地图，像饥荒中的那样，使用   波函数坍缩算法，WFC算法   
+
+
+
+
+
 [【Unity】TimeLine&Cinemachine系列教程——动态赋值，我要打十个！](https://www.bilibili.com/read/cv29363/)
 
 
