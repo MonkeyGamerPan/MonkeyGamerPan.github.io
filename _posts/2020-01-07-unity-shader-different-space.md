@@ -1,13 +1,9 @@
 ---
 layout: post
-title: "Unity Shader Note"
+title: "Unity 不同的空间"
 featured-img: shane-rounce-205187
 categories: [unity, shader]
 ---
-
-## 顶点着色器
-
-顶点着色器的主要工作是  **坐标变换和逐顶点光照**。
 
 
 
