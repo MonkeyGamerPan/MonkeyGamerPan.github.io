@@ -29,6 +29,7 @@ categories: [unity, shader]
 |                  _Object2World                  | 当前的模型矩阵，用于将顶点/方向矢量从模型空间变换到世界空间  |
 |                  _World2Object                  | _Object2World的逆矩阵，用于将顶点/方向矢量从世界空间变换到模型空间 |
 | TANGENT_SPACE_ROTATION（在UnityCG.cginc中被定义 |                将变量从模型空间变换到切线空间                |
+|                ComputeScreenPos                 | 输入参数pos是经过MVP矩阵变换后在裁剪空间中的顶点坐标,将裁剪空间中的点变换到屏幕空间中的点。 |
 
 
 
