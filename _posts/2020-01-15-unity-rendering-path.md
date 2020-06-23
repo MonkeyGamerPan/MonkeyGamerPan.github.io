@@ -143,7 +143,7 @@ SH 光源的缺点：
 
 |                          名称                           |   类型   |                             描述                             |
 | :-----------------------------------------------------: | :------: | :----------------------------------------------------------: |
-|                      _LightColor0                       |  float4  |                 该Pass处理的逐像素光源的颜色                 |
+|                      _LightColor0                       |  float4  | 该Pass处理的逐像素光源的颜色（已经是颜色和强度相乘的结果了） |
 |                  _WorldSpaceLightPos0                   |  float4  | _ WorldSpaceLightPos0.xyz是该Pass处理的逐像素光源的位置。如果该光源是平行光，那么_WorldSpaceLightPos0.w是0，其他光源类型w值为1 |
 |                      _LightMatrix0                      | float4x4 | 从世界空间到光源空间的变换矩阵。可以用于采样cookie和光强衰减（attenuation）纹理 |
 | unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0 |  float4  | 仅用于Base Pass。前4个非重要的(not important)点光源在世界空间中的位置 |
@@ -160,6 +160,223 @@ SH 光源的缺点：
 | float3 UnityWorldSpaceLightDir (float4 v) | 仅可用于前向渲染中。输入一个世界空间中的顶点位置，返回世界空间中从该点到光源的光照方向。没有被归一化 |
 |    float3 ObjSpaceLightDir (float4 v)     | 仅可用于前向渲染中。输入一个模型空间中的顶点位置，返回模型空间中从该点到光源的光照方向。没有被归一化 |
 |      float3 Shade4PointLights (...)       | 仅可用于前向渲染中。计算四个点光源的光照，它的参数是已经打包进矢量的光照数据，通常就是上表的内置变量，如unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0、unity_LightColor和unity_4LightAtten0等。前向渲染通常会使用这个函数来计算逐顶点光照 |
+
+
+
+#### 前向渲染shader示例：
+
+```c#
+Shader "ShaderPath/ForwardAddShader"//shader的选择路径
+{
+	Properties//该Shader可控的属性
+	{
+		_DiffuseColor ("DiffuseColor",Color) = (1,1,1,1)//漫反射的主色调
+		_SpecularColor ("SpecularColor",Color) = (1,1,1,1)//高光反射的主色调
+		_Gloss ("Gloss",Range(1,100)) = 2 //光泽度（反光度） 控制高光区域的大小
+	}
+	SubShader//子着色器
+	{
+		Tags{"Queue"="Transparent" "IgnoreProject"="True" "RenderType"="Transparent"}
+
+		Pass //第一个Pass 光照模型是ForwardBase 渲染那些只需要执行一次的光 比如平行光、环境光
+		{
+			// ！！！！！特别注意 这里要关闭深度写入
+			Tags{"LightMode" = "ForwardBase"}
+			//与ENDCG相照应，将CG代码包裹
+			CGPROGRAM
+			//确保我们在使用光照衰减等光照变量的时候能够获得正确的值
+			#pragma multi_compile_fwdbase 
+			//顶点函数定义
+			#pragma vertex diffusevert  
+			//片元函数定义
+			#pragma fragment diffusefrag
+			//引入必要的Unity库 如下面的UnityObjectToClipPos 就是库中函数
+			#include "UnityCG.cginc"
+			//引入光照库 _LightColor0需要用
+			#include "Lighting.cginc"
+			struct appdata
+			{
+				float4 vertex : POSITION;//每个顶点结构体必须有的
+				float3 normal : NORMAL;//定义法线
+			};
+
+			struct v2f
+			{
+				fixed3 worldNormal : TEXCOORD0; 
+				float3 worldPos : TEXCOORD1;
+				float4 pos : SV_POSITION;//每个片元结构体必须有的
+                float3 vertexLight:TEXCOORD2;
+			};
+			
+			fixed4 _DiffuseColor;
+			fixed4 _SpecularColor;
+			float _Gloss;
+
+
+			v2f diffusevert (appdata v)
+			{
+				v2f o;
+				o.pos = UnityObjectToClipPos(v.vertex);//把顶点从模型空间转换到剪裁空间
+				o.worldNormal = normalize(UnityObjectToWorldNormal(v.normal));//把法线从模型空间转换到世界空间
+				o.worldPos = mul(unity_ObjectToWorld,v.vertex).xyz;//模型坐标转到世界坐标
+                
+            #ifdef LIGHTMAP_OFF   //sh光
+				float shLight = ShadeSH9(float4(v.normal,1.0));
+				o.vertexLight = shLight;
+			
+            #ifdef VERTEXLIGHT_ON  //顶点光
+				
+                float3 vertexLight = Shade4PointLights(unity_4LightPosX0,unity_4LightPosY0,unity_4LightPosZ0,
+				unity_LightColor[0].rgb,unity_LightColor[1].rgb,unity_LightColor[2].rgb,unity_LightColor[3].rgb,
+				unity_4LightAtten0,o.worldPos,o.worldNormal);
+				o.vertexLight += vertexLight;
+                
+				return o;
+			}
+			
+			fixed4 diffusefrag (v2f i) : SV_Target//返回一个RGBA到模型上
+			{
+				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz; //环境光
+				fixed3 lightDir = UnityWorldSpaceLightDir(i.worldPos);//获取光源在世界空间下的方向（光源发射出来的方向）
+				fixed3 diffuse = _LightColor0.rgb * _DiffuseColor * (1+dot(lightDir,i.worldNormal))/2;
+				fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.worldPos);//计算眼睛的方向 相机位置-模型的世界坐标 向量
+				//Blinn-Phong模型高光 
+				fixed3 halfView = normalize(lightDir + viewDir);
+				fixed3 specular = _LightColor0.rgb * _SpecularColor * pow(saturate(dot(i.worldNormal,halfView)),_Gloss);
+				return fixed4(ambient + diffuse +specular + i.vertexLight,1); //a通道返回原图片纹理的a通道值+_AlphaScale
+			}
+			ENDCG
+		}
+		//第二个Pass的光照模型为 ForwardAdd， 该Pass可以被多个光源调用，因此该部分主要渲染的就是点光源和聚光灯
+		//大部分代码与第一个Pass相同，比较有区别的主要还是在片元着色#if defined (POINT) //对于点光源
+				        float3 lightCoord = mul(unity_WorldToLight, float4(i.worldPos, 1)).xyz;
+				        fixed atten = tex2D(_LightTexture0, dot(lightCoord, lightCoord).rr).UNITY_ATTEN_CHANNEL;
+				    #elif defined (SPOT) //对于聚光灯
+				        float4 lightCoord = mul(unity器中光照方向的计算
+		Pass
+		{
+			Tags{"LightMode" = "ForwardAdd"}
+			Blend One One //使计算得到的光照结果和之前的光照结果叠加
+			CGPROGRAM
+			//确保得到正确的光照变量信息
+			#pragma multi_compile_fwdadd
+			//顶点函数定义
+			#pragma vertex vert  
+			//片元函数定义
+			#pragma fragment frag
+			//引入必要的Unity库 如下面的UnityObjectToClipPos 就是库中函数
+			#include "UnityCG.cginc"
+			//引入光照库 _LightColor0需要用
+			#include "Lighting.cginc"
+			//引入自动光照库 unity_WorldToLight要用
+			#include "AutoLight.cginc"
+			struct appdata
+			{
+				float4 vertex : POSITION;//每个顶点结构体必须有的
+				float3 normal : NORMAL;//定义法线
+			};
+
+			struct v2f
+			{
+				fixed3 worldNormal : TEXCOORD0; 
+				float3 worldPos : TEXCOORD1;
+				float4 pos : SV_POSITION;//每个片元结构体必须有的
+			};
+			
+			fixed4 _DiffuseColor;
+			fixed4 _SpecularColor;
+			float _Gloss;
+
+
+			v2f vert (appdata v)
+			{
+				v2f o;
+				o.pos = UnityObjectToClipPos(v.vertex);//把顶点从模型空间转换到剪裁空间
+				o.worldNormal = normalize(UnityObjectToWorldNormal(v.normal));//把法线从模型空间转换到世界空间
+				o.worldPos = mul(unity_ObjectToWorld,v.vertex).xyz;//模型坐标转到世界坐标
+				return o;
+			}
+			
+			fixed4 frag (v2f i) : SV_Target//返回一个RGBA到模型上
+			{
+				#ifdef USING_DIRECTIONAL_LIGHT 
+					fixed3 lightDir = UnityWorldSpaceLightDir(i.worldPos);//获取光源在世界空间下的方向（光源发射出来的方向）
+				#else
+					fixed3 lightDir = normalize(_WorldSpaceLightPos0.xyz-i.worldPos);//获取光源在世界空间下的方向（光源发射出来的方向）
+				#endif
+				fixed3 diffuse = _LightColor0.rgb * _DiffuseColor * (1+dot(lightDir,i.worldNormal))/2;
+				fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.worldPos);//计算眼睛的方向 相机位置-模型的世界坐标 向量
+				//Blinn-Phong模型高光 
+				fixed3 halfView = normalize(lightDir + viewDir);
+				fixed3 specular = _LightColor0.rgb * _SpecularColor * pow(saturate(dot(i.worldNormal,halfView)),_Gloss);
+				#ifdef USING_DIRECTIONAL_LIGHT //如果是直射光，光照强度是不会衰减的，因此是1
+					fixed atten = 1.0;
+				#else
+					#if defined (POINT) //对于点光源
+				        float3 lightCoord = mul(unity_WorldToLight, float4(i.worldPos, 1)).xyz;
+				        fixed atten = tex2D(_LightTexture0, dot(lightCoord, lightCoord).rr).UNITY_ATTEN_CHANNEL;
+				    #elif defined (SPOT) //对于聚光灯
+				        float4 lightCoord = mul(unity_WorldToLight, float4(i.worldPos, 1));
+				        fixed atten = (lightCoord.z > 0) * tex2D(_LightTexture0, lightCoord.xy / lightCoord.w + 0.5).w * tex2D(_LightTextureB0, dot(lightCoord, lightCoord).rr).UNITY_ATTEN_CHANNEL;
+				    #else
+				        fixed atten = 1.0;
+				    #endif
+				#endif
+				return fixed4((diffuse +specular)*atten,1); //颜色值*光照衰减
+			}
+			ENDCG
+		}
+	}
+	Fallback "Transparent/VertexLit"
+}
+```
+
+代码分析：
+
+```c#
+	#if defined (POINT) //对于点光源
+		float3 lightCoord = mul(unity_WorldToLight, float4(i.worldPos, 1)).xyz;
+		fixed atten = tex2D(_LightTexture0, dot(lightCoord, lightCoord).rr).UNITY_ATTEN_CHANNEL;
+	#elif defined (SPOT) //对于聚光灯
+		float4 lightCoord = mul(unity_WorldToLight, float4(i.worldPos, 1));
+		fixed atten = (lightCoord.z > 0) * tex2D(_LightTexture0, lightCoord.xy / lightCoord.w + 0.5).w * tex2D(_LightTextureB0, dot(lightCoord, lightCoord).rr).UNITY_ATTEN_CHANNEL;
+	#else
+		fixed atten = 1.0;
+	#endif
+```
+
+**这里是对于不同的光源类型计算不同的光照。**	
+
+**对于不同的光照的衰减和阴影，unity中提供了一个内置的宏UNITY_LIGHT_ATTENUATION来同一管理。**
+
+
+
+
+
+
+
+**对于点光源：**
+
+```c#
+float3 lightCoord = mul(unity_WorldToLight, float4(i.worldPos, 1)).xyz;
+fixed atten = tex2D(_LightTexture0, dot(lightCoord, lightCoord).rr).UNITY_ATTEN_CHANNEL;
+```
+
+**点光源： “_LightTexture0” 是Unity的一张内置光照衰减表，尽管我们可以通过计算得到更为准确的衰减值，但是计算复杂并且较为耗性能。
+	首先使用矩阵 “unity_WorldToLight” 把模型的点从世界坐标转到光源空间坐标，接着通过光源空间下点的位置信息从 _LightTexture0 采集到对应的光照衰减值。**
+
+
+
+**对于聚光灯：**
+
+```c#
+float4 lightCoord = mul(unity_WorldToLight, float4(i.worldPos, 1));
+fixed atten = (lightCoord.z > 0) * tex2D(_LightTexture0, lightCoord.xy / lightCoord.w + 0.5).w * tex2D(_LightTextureB0, dot(lightCoord, lightCoord).rr).UNITY_ATTEN_CHANNEL;
+```
+
+**聚光灯：“_LightTextureB0” 是Unity的一张内置光照衰减表**
+
+
 
 
 

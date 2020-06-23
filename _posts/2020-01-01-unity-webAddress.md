@@ -66,6 +66,7 @@ ECS是什么？
 
 游戏小组空间 ：http://renxufeng.ys168.com/
 
-
+unity shader 入门精要 冯乐乐 github 博客地址: http://candycat1992.github.io/portfolio/
+unity shader 入门精要 配套资源github地址：https://github.com/candycat1992/Unity_Shaders_Book
 
 ##### Unity Gerstner Waves水面波浪:用于模拟水的波浪
