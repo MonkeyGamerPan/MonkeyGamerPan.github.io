@@ -15,6 +15,11 @@ categories: [unity, shader]
 | :-----------------------------------------------: | :----------------------------------------------------------: |
 |              UNITY_LIGHT_ATTENUATION              | unity中的内置宏，统一管理unity中的光照衰减和阴影。（即光照衰减atten 乘以 阴影系数） |
 | TANGENT_SPACE_ROTATION（在UnityCG.cginc中被定义） | 使用这个宏可以获得一个 将变量从模型空间变换到切线空间的矩阵rotation； |
+|                                                   |                                                              |
+|                 SHADOW_COORDS（）                 | 阴影接收三剑客其一，声明一个用于对阴影纹理采样的坐标。需要注意的是，这个宏的参数需要是下一个可用的插值寄存器的索引值，此宏的参数中的寄存器索引值由前面的索引值加一，(定义在AutoLight.cginc中) |
+|                TRANSFER_SHADOW（）                | 阴影接受三剑客其二，用于在顶点着色器中计算上一步中声明的阴影纹理坐标。(定义在AutoLight.cginc中) |
+|              SHADOW_ ATTENUATION（）              |  阴影接受三剑客其三，计算阴影值。(定义在AutoLight.cginc中)   |
+|                                                   |                                                              |
 
 
 
