@@ -59,19 +59,118 @@ categories: [unity, shader]
 
 ### 反射
 
-​	使用了反射效果的物体通常看起来就像镀了层金属。想要模拟反射效果很简单，我们只需要通过入射光线的方向和表面法线方向来计算反射方向，再利用反射方向对立方体纹理采样即可。
+​	使用了反射效果的物体通常看起来就像镀了层金属。想要模拟反射效果很简单，**我们只需要通过入射光线的方向和表面法线方向来计算反射方向，再利用反射方向对立方体纹理采样即可。**
+
+示例代码如下：
+
+```c#
+Shader "Unity Shaders Book/Chapter 10/Reflection" {
+	Properties {
+		_Color ("Color Tint", Color) = (1, 1, 1, 1)
+		_ReflectColor ("Reflection Color", Color) = (1, 1, 1, 1)
+		_ReflectAmount ("Reflect Amount", Range(0, 1)) = 1
+		_Cubemap ("Reflection Cubemap", Cube) = "_Skybox" {}
+	}
+	SubShader {
+		Tags { "RenderType"="Opaque" "Queue"="Geometry"}
+		
+		Pass { 
+			Tags { "LightMode"="ForwardBase" }
+			
+			CGPROGRAM
+			
+			#pragma multi_compile_fwdbase
+			
+			#pragma vertex vert
+			#pragma fragment frag
+			
+			#include "Lighting.cginc"
+			#include "AutoLight.cginc"
+			
+			fixed4 _Color;
+			fixed4 _ReflectColor;
+			fixed _ReflectAmount;
+			samplerCUBE _Cubemap;
+			
+			struct a2v {
+				float4 vertex : POSITION;
+				float3 normal : NORMAL;
+			};
+			
+			struct v2f {
+				float4 pos : SV_POSITION;
+				float3 worldPos : TEXCOORD0;
+				fixed3 worldNormal : TEXCOORD1;
+				fixed3 worldViewDir : TEXCOORD2;
+				fixed3 worldRefl : TEXCOORD3;
+				SHADOW_COORDS(4)
+			};
+			
+			v2f vert(a2v v) {
+				v2f o;
+				
+				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				
+				o.worldNormal = UnityObjectToWorldNormal(v.normal);
+				
+				o.worldPos = mul(_Object2World, v.vertex).xyz;
+				
+				o.worldViewDir = UnityWorldSpaceViewDir(o.worldPos);
+				
+				// Compute the reflect dir in world space
+				o.worldRefl = reflect(-o.worldViewDir, o.worldNormal);
+				
+				TRANSFER_SHADOW(o);
+				
+				return o;
+			}
+			
+			fixed4 frag(v2f i) : SV_Target {
+				fixed3 worldNormal = normalize(i.worldNormal);
+				fixed3 worldLightDir = normalize(UnityWorldSpaceLightDir(i.worldPos));		
+				fixed3 worldViewDir = normalize(i.worldViewDir);		
+				
+				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
+				
+				fixed3 diffuse = _LightColor0.rgb * _Color.rgb * max(0, dot(worldNormal, worldLightDir));
+				
+				// Use the reflect dir in world space to access the cubemap
+				fixed3 reflection = texCUBE(_Cubemap, i.worldRefl).rgb * _ReflectColor.rgb;
+				
+				UNITY_LIGHT_ATTENUATION(atten, i, i.worldPos);
+				
+				// Mix the diffuse color with the reflected color
+				fixed3 color = ambient + lerp(diffuse, reflection, _ReflectAmount) * atten;
+				
+				return fixed4(color, 1.0);
+			}
+			
+			ENDCG
+		}
+	}
+	FallBack "Reflective/VertexLit"
+}
+```
+
+​	对立方体纹理的采样需要使用CG的texCUBE函数。注意到，在上面的计算中，我们在采样时并没有对i.worldRefl进行归一化操作。这是因为，用于采样的参数仅仅是作为方向变量传递给texCUBE函数的，因此我们没有必要进行一次归一化的操作。然后，我们使用_ReflectAmount来混合漫反射颜色和反射颜色，并和环境光照相加后返回。
+
+​	在上面的计算中，我们选择在顶点着色器中计算反射方向。当然，我们也可以选择在片元着色器中计算，这样得到的效果更加细腻。但是，对于绝大多数人来说这种差别往往是可以忽略不计的，因此出于性能方面的考虑，我们选择在顶点着色器中计算反射方向。
 
 
 
 
 
+### 折射
 
+​	折射的物理原理比反射复杂一些。我们在初中物理就已经接触过折射的定义：当光线从一种介质（例如空气）斜射入另一种介质（例如玻璃）时，传播方向一般会发生改变。当给定入射角时，我们可以使用**斯涅尔定律（Snell's Law）**来计算反射角。当光从介质1沿着和表面法线夹角为θ1的方向斜射入介质2时，我们可以使用如下公式计算折射光线与法线的夹角θ2：
 
+​																	**η1sinθ1=η2sinθ2**
 
+<img src="../assets/img/resources/Snell'sLaw.png" style="zoom: 25%;" />
 
+​	其中，**η1和η2分别是两个介质的折射率（index of refraction）**。折射率是一项重要的物理常数，例如真空的折射率是1，**而玻璃的折射率一般是1.5**。
 
-
-
+​	通常来说，当得到折射方向后我们就会直接使用它来对立方体纹理进行采样，但这是不符合物理规律的。对一个透明物体来说，一种更准确的模拟方法需要计算两次折射—— 一次是当光线进入它的内部时，而另一次则是从它内部射出时。但是，想要在实时渲染中模拟出第二次折射方向是比较复杂的，而且仅仅模拟一次得到的效果从视觉上看起来“也挺像那么回事的”。正如我们之前提到的——图形学第一准则“如果它看起来是对的，那么它就是对的”。因此，在实时渲染中我们通常仅模拟第一次折射。
 
 
 

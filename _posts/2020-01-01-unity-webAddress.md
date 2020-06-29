@@ -64,9 +64,38 @@ ECS是什么？
 
 
 
+
+
 游戏小组空间 ：http://renxufeng.ys168.com/
 
 unity shader 入门精要 冯乐乐 github 博客地址: http://candycat1992.github.io/portfolio/
 unity shader 入门精要 配套资源github地址：https://github.com/candycat1992/Unity_Shaders_Book
 
 ##### Unity Gerstner Waves水面波浪:用于模拟水的波浪
+
+
+
+[Unity3D教程：镜面反射原理及实现（一）](https://gameinstitute.qq.com/community/detail/106151)
+
+
+
+[unity3d 实时平面反射的拓展和应用](https://zhuanlan.zhihu.com/p/37648960)
+
+
+
+[unity URP移动平台的屏幕空间反射](https://zhuanlan.zhihu.com/p/150890059)
+
+
+
+[Unity3D水特效之雨天模拟（一）](https://zhuanlan.zhihu.com/p/37796757)
+
+
+
+[MaxwellGeng 一只二哈（知乎大佬首页）](https://www.zhihu.com/people/maxwellgeng)
+
+
+
+
+
+[Unity3D-Shader-热扭曲效果](https://www.cnblogs.com/lijiajia/p/6861516.html)
+
