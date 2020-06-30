@@ -20,6 +20,7 @@ categories: [unity, shader]
 |                TRANSFER_SHADOW（）                | 阴影接受三剑客其二，用于在顶点着色器中计算上一步中声明的阴影纹理坐标。(定义在AutoLight.cginc中) |
 |              SHADOW_ ATTENUATION（）              |  阴影接受三剑客其三，计算阴影值。(定义在AutoLight.cginc中)   |
 |                                                   |                                                              |
+|         TRANSFORM_TEX(v.vertex,_MainTex)          | TRANSFORM_TEX是在UnityCG.cginc中定义的,用于计算<br>o.uv = v.texcoord.xy * _MainTex_ST.xy + _MainTex_ST.zw; |
 
 
 
@@ -239,9 +240,9 @@ fixed4 frag(v2f i) : SV_Target {
 
 
 
+### CG语音中三种数据类型的数值范围
 
-
-
+![](../assets/img/resources/fixedNumberArea.png)
 
 
 
