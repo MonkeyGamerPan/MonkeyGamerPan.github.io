@@ -30,6 +30,15 @@ categories: [unity, shader]
 |              SHADOW_ ATTENUATION（）              |  阴影接受三剑客其三，计算阴影值。(定义在AutoLight.cginc中)   |
 |                                                   |                                                              |
 |         TRANSFORM_TEX(v.vertex,_MainTex)          | TRANSFORM_TEX是在UnityCG.cginc中定义的,用于计算<br>o.uv = v.texcoord.xy * _MainTex_ST.xy + _MainTex_ST.zw; |
+|                                                   |                                                              |
+|                 V2F_SHADOW_CASTER                 |     阴影投射使用，写在stuct v2f中，定义在UnityCG.cginc中     |
+|      TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)       |               阴影投射使用，写在vert顶点函数中               |
+|             SHADOW_CASTER_FRAGMENT(i)             |               阴影投射使用，写在frag片元函数中               |
+|                                                   |                                                              |
+|               SAMPLE_DEPTH_TEXTURE                | unity内置宏，用于处理不同平台对深度的差异，直接使用这个宏对深度纹理进行采样。SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv) |
+|           UNITY_PROJ_COORD（i.srcPos）            |                         深度值 [0,1]                         |
+|             SAMPLEDEPTH_TEXTURE_PROJ              | 接受两个参数—深度纹理和一个float3或float4类型的纹理坐标，它的内部使用了tex2Dproj这样的函数进行投影纹理采样，纹理坐标的前两个分量首先会除以最后一个分量，再进行纹理采样。如果提供了第四个分量，还会进行一次比较，通常用于阴影的实现中。SAMPLE_DEPTH_TEXTURE_PROJ的第二个参数通常是由顶点着色器输出插值而得的屏幕坐标。 |
+|             SAMPLE_DEPTH_TEXTURE_LOD              |                                                              |
 
 
 
@@ -80,18 +89,21 @@ float4 modelPos = mul(viewPos, UNITY_MATRIX_IT_MV);
 
 ​	手动计算这些光源信息的过程相对比较麻烦（但并不意味着你不需要了解它们的原理）。幸运的是，Unity提供了一些内置函数来帮助我们计算这些信息。如下表所示：
 
-|                    函数名                     |                             描述                             |
-| :-------------------------------------------: | :----------------------------------------------------------: |
-|      float3 WorldSpaceViewDir (float4 v)      | 输入一个模型空间中的顶点位置，返回世界空间中从该点到摄像机的观察方向。内部实现使用了UnityWorldSpaceViewDir函数 |
-|   float3 UnityWorldSpaceViewDir (float4 v)    | 输入一个世界空间中的顶点位置，返回世界空间中从该点到摄像机的观察方向 |
-|       float3 ObjSpaceViewDir (float4 v)       | 输入一个模型空间中的顶点位置，返回模型空间中从该点到摄像机的观察方向 |
-|     float3 WorldSpaceLightDir (float4 v)      | 仅可用于前向渲染中 。输入一个模型空间中的顶点位置，返回世界空间中从该点到光源的光照方向。内部实现使用了UnityWorldSpaceLightDir函数。没有被归一化 |
-|   float3 UnityWorldSpaceLightDir (float4 v)   | 仅可用于前向渲染中 。输入一个世界空间中的顶点位置，返回世界空间中从该点到光源的光照方向。没有被归一化 |
-|      float3 ObjSpaceLightDir (float4 v)       | 仅可用于前向渲染中 。输入一个模型空间中的顶点位置，返回模型空间中从该点到光源的光照方向。没有被归一化 |
-| float3 UnityObjectToWorldNormal (float3 norm) |             把法线方向从模型空间转换到世界空间中             |
-|   float3 UnityObjectToWorldDir (float3 dir)   |             把方向矢量从模型空间变换到世界空间中             |
-|   float3 UnityWorldToObjectDir(float3 dir)    |             把方向矢量从世界空间变换到模型空间中             |
-|         ComputeScreenPos(float3 pos)          | 输入参数pos是经过MVP矩阵变换后在裁剪空间中的顶点坐标,将裁剪空间中的点变换到屏幕空间中的点。使用xy分量再除以w分量才能得到视口空间中的坐标。 |
+|                            函数名                            |                             描述                             |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
+|             float3 WorldSpaceViewDir (float4 v)              | 输入一个模型空间中的顶点位置，返回世界空间中从该点到摄像机的观察方向。内部实现使用了UnityWorldSpaceViewDir函数 |
+|           float3 UnityWorldSpaceViewDir (float4 v)           | 输入一个世界空间中的顶点位置，返回世界空间中从该点到摄像机的观察方向 |
+|              float3 ObjSpaceViewDir (float4 v)               | 输入一个模型空间中的顶点位置，返回模型空间中从该点到摄像机的观察方向 |
+|             float3 WorldSpaceLightDir (float4 v)             | 仅可用于前向渲染中 。输入一个模型空间中的顶点位置，返回世界空间中从该点到光源的光照方向。内部实现使用了UnityWorldSpaceLightDir函数。没有被归一化 |
+|          float3 UnityWorldSpaceLightDir (float4 v)           | 仅可用于前向渲染中 。输入一个世界空间中的顶点位置，返回世界空间中从该点到光源的光照方向。没有被归一化 |
+|              float3 ObjSpaceLightDir (float4 v)              | 仅可用于前向渲染中 。输入一个模型空间中的顶点位置，返回模型空间中从该点到光源的光照方向。没有被归一化 |
+|        float3 UnityObjectToWorldNormal (float3 norm)         |             把法线方向从模型空间转换到世界空间中             |
+|          float3 UnityObjectToWorldDir (float3 dir)           |             把方向矢量从模型空间变换到世界空间中             |
+|           float3 UnityWorldToObjectDir(float3 dir)           |             把方向矢量从世界空间变换到模型空间中             |
+|                 ComputeScreenPos(float3 pos)                 | 输入参数pos是经过MVP矩阵变换后在裁剪空间中的顶点坐标,将裁剪空间中的点变换到屏幕空间中的点。使用xy分量再除以w分量才能得到视口空间中的坐标。 |
+| DecodeDepthNormal( float4 enc, out float depth, out float3 normal ) | 对使用tex2D采样_CameraDepthNormalsTexture后的结果进行解码处理，得到深度值和法线方向，此深度值是线性深度值，并且是视角空间下的，而且获得的法线方向也是视角空间下的。 |
+|                        LinearEyeDepth                        | 负责把深度纹理的采样结果转换到**视角空间下的深度值**,内部使用了_ZBufferParams变量来得到远近裁剪平面的距离。 |
+|                        Linear01Depth                         | 会返回一个范围在[0，1]的**线性深度值**,内部使用了_ZBufferParams变量来得到远近裁剪平面的距离。相当于上面的函数结果除以摄像机Far裁剪平面的值的结果。 |
 
 
 
