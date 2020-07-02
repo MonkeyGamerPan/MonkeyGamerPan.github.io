@@ -102,7 +102,7 @@ float4 modelPos = mul(viewPos, UNITY_MATRIX_IT_MV);
 |           float3 UnityWorldToObjectDir(float3 dir)           |             把方向矢量从世界空间变换到模型空间中             |
 |                 ComputeScreenPos(float3 pos)                 | 输入参数pos是经过MVP矩阵变换后在裁剪空间中的顶点坐标,将裁剪空间中的点变换到屏幕空间中的点。使用xy分量再除以w分量才能得到视口空间中的坐标。 |
 | DecodeDepthNormal( float4 enc, out float depth, out float3 normal ) | 对使用tex2D采样_CameraDepthNormalsTexture后的结果进行解码处理，得到深度值和法线方向，此深度值是线性深度值，并且是视角空间下的，而且获得的法线方向也是视角空间下的。 |
-|                        LinearEyeDepth                        | 负责把深度纹理的采样结果转换到**视角空间下的深度值**,内部使用了_ZBufferParams变量来得到远近裁剪平面的距离。 |
+|                        LinearEyeDepth                        | 负责把深度纹理的采样结果转换到**视角空间下的线性深度值**,内部使用了_ZBufferParams变量来得到远近裁剪平面的距离。 |
 |                        Linear01Depth                         | 会返回一个范围在[0，1]的**线性深度值**,内部使用了_ZBufferParams变量来得到远近裁剪平面的距离。相当于上面的函数结果除以摄像机Far裁剪平面的值的结果。 |
 
 
