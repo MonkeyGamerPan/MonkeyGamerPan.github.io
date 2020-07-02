@@ -559,7 +559,12 @@ public static void Blit(Texture src, Material mat, int pass = -1);
 
 ​	其中，参数src对应了源纹理，在屏幕后处理技术中，这个参数通常就是当前屏幕的渲染纹理或是上一步处理后得到的渲染纹理。参数dest是目标渲染纹理，如果它的值为null就会直接将结果显示在屏幕上。参数mat是我们使用的材质，这个材质使用的Unity Shader将会进行各种屏幕后处理操作，**而src纹理将会被传递给Shader中名为_MainTex的纹理属性**。参数pass的默认值为-1，表示将会依次调用Shader内的所有Pass。否则，只会调用给定索引的Pass。
 
-​	在默认情况下，OnRenderImage函数会在所有的不透明和透明的Pass执行完毕后被调用，以便对场景中所有游戏对象都产生影响。但有时，我们希望在不透明的Pass（即渲染队列小于等于2500的Pass，内置的Background、Geometry和AlphaTest渲染队列均在此范围内）执行完毕后立即调用OnRenderImage函数，从而不对透明物体产生任何影响。此时，**我们可以在OnRenderImage函数前添加ImageEffectOpaque属性来实现这样的目的。**
+​	在默认情况下，OnRenderImage函数会在所有的不透明和透明的Pass执行完毕后被调用，以便对场景中所有游戏对象都产生影响。但有时，我们希望在不透明的Pass（即渲染队列小于等于2500的Pass，内置的Background、Geometry和AlphaTest渲染队列均在此范围内）执行完毕后立即调用OnRenderImage函数，从而不对透明物体产生任何影响。此时，**我们可以在OnRenderImage函数前添加ImageEffectOpaque属性来实现这样的目的。**例如;
+
+```c#
+[ImageEffectOpaque]
+void OnRenderImage (RenderTexture src, RenderTexture dest){...}
+```
 
 <br/>
 
@@ -571,13 +576,17 @@ public static void Blit(Texture src, Material mat, int pass = -1);
 
 
 
+### 使用深度+法线纹理进行边缘检测
 
+​	我们曾介绍如何使用Sobel算子对屏幕图像进行边缘检测，实现描边的效果。但是，这种直接利用颜色信息进行边缘检测的方法会产生很多我们不希望得到的边缘线，例如：物体的纹理、阴影等位置也被描上黑边，而这往往不是我们希望看到的。接下来，我们将学习如何在深度和法线纹理上进行边缘检测，这些图像不会受纹理和光照的影响，而仅仅保存了当前渲染物体的模型信息，通过这样的方式检测出来的边缘更加可靠。下图显示了使用深度+法线纹理进行边缘检测的效果：
 
+![](../assets/img/resources/EdgedetectionWithDepthNormal.png)
 
+ 			在深度和法线纹理上进行更健壮的边缘检测。左边：在原图上描边的效果。右边：只显示描边的效果
 
+<br/>
 
-
-
+<br/>
 
 
 
