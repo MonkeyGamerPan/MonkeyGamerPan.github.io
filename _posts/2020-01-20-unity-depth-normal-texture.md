@@ -5,7 +5,7 @@ featured-img: shane-rounce-205187
 categories: [unity, Shader]						 
 ---
 
-## 获取深入和法线纹理
+## 获取深度和法线纹理
 
 ### 原理:
 

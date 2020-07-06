@@ -110,7 +110,9 @@ Shader "Unity Shaders Book/Chapter 14/Toon Shading" {
 		_Color ("Color Tint", Color) = (1, 1, 1, 1)
 		_MainTex ("Main Tex", 2D) = "white" {}
 		_Ramp ("Ramp Texture", 2D) = "white" {}
-		_Outline ("Outline", Range(0, 1)) = 0.1
+		_Outline ("OutviewNormal.z = -0.5;
+                        viewNormal = normalize(viewNormal);
+                        viewPos = viewPos + viewNormal * _Outline;line", Range(0, 1)) = 0.1
 		_OutlineColor ("Outline Color", Color) = (0, 0, 0, 1)
 		_Specular ("Specular", Color) = (1, 1, 1, 1)
 		_SpecularScale ("Specular Scale", Range(0, 0.1)) = 0.01
@@ -267,7 +269,9 @@ Shader "Unity Shaders Book/Chapter 14/Toon Shading" {
 
 ## 素描风格的渲染
 
+​	另一个非常流行的非真实感渲染是素描风格的渲染。微软研究院的Praun等人在2001年的SIGGRAPH上发表了一篇非常著名的论文[4]。在这篇文章中，他们使用了提前生成的素描纹理来实现实时的素描风格渲染，这些纹理组成了一个色调艺术映射（Tonal Art Map，TAM）,如下图所示。在下图中，从左到右纹理中的笔触逐渐增多，用于模拟不同光照下的漫反射效果，从上到下则对应了每张纹理的多级渐远纹理（mipmaps）。这些多级渐远纹理的生成并不是简单的对上一层纹理进行降采样，而是需要保持笔触之间的间隔，以便更真实地模拟素描效果。
 
+<div align=center>![](../assets/img/resources/TonalArtMap.png)
 
 
 
