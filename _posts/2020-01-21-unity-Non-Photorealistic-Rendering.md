@@ -269,19 +269,202 @@ Shader "Unity Shaders Book/Chapter 14/Toon Shading" {
 
 ## 素描风格的渲染
 
-​	另一个非常流行的非真实感渲染是素描风格的渲染。微软研究院的Praun等人在2001年的SIGGRAPH上发表了一篇非常著名的论文[4]。在这篇文章中，他们使用了提前生成的素描纹理来实现实时的素描风格渲染，这些纹理组成了一个色调艺术映射（Tonal Art Map，TAM）,如下图所示。在下图中，从左到右纹理中的笔触逐渐增多，用于模拟不同光照下的漫反射效果，从上到下则对应了每张纹理的多级渐远纹理（mipmaps）。这些多级渐远纹理的生成并不是简单的对上一层纹理进行降采样，而是需要保持笔触之间的间隔，以便更真实地模拟素描效果。
+​	另一个非常流行的非真实感渲染是素描风格的渲染。微软研究院的Praun等人在2001年的SIGGRAPH上发表了一篇非常著名的论文。在这篇文章中，他们使用了提前生成的素描纹理来实现实时的素描风格渲染，这些纹理组成了一个**色调艺术映射（Tonal Art Map，TAM）**,如下图所示。在下图中，从左到右纹理中的笔触逐渐增多，用于模拟不同光照下的漫反射效果，从上到下则对应了每张纹理的多级渐远纹理（mipmaps）。这些多级渐远纹理的生成并不是简单的对上一层纹理进行降采样，而是需要保持笔触之间的间隔，以便更真实地模拟素描效果。
 
-<div align=center>![](../assets/img/resources/TonalArtMap.png)
+![](../assets/img/resources/TonalArtMap.png)
+
+​	下面我们会实现一个素描风格的渲染结果，实现方法是：我们不考虑多级渐远纹理的生成，而直接使用6张素描纹理进行渲染。**在渲染阶段，我们首先在顶点着色阶段计算逐顶点的光照，根据光照结果来决定6张纹理的混合权重，并传递给片元着色器。**然后，在片元着色器中根据这些权重来混合6张纹理的采样结果。结果如下：
+
+![](../assets/img/resources/TheResultOfTonalArtMap.png)
+
+<br/><br/><br/>
+
+Shader示例代码：
+
+```c#
+Shader "Custom/TonalArtShader"{
+    Properties{
+        _Color("Color Tint",Color)=(1,1,1,1)
+        _TileFactor("Tile Factor",Float)=8     //纹理的平铺系数，数值越大，线条越密集。
+        _OutLine("OutLine",Range(0,1))=0.5
+        _Hatch0("Hatch0",2D)="white"{}
+        _Hatch1("Hatch1",2D)="white"{}
+        _Hatch2("Hatch2",2D)="white"{}
+        _Hatch3("Hatch3",2D)="white"{}
+        _Hatch4("Hatch4",2D)="white"{}
+        _Hatch5("Hatch5",2D)="white"{}
+    }
 
 
+    SubShader{
+
+        Tags{"RenderType"="Opaque" "Queue"="Geometry"}
+
+        Pass{
+            NAME "OUTLINE"
+            Cull Front
+            CGPROGRAM
+            
+            #pragma vertex vert
+            #pragma fragment frag
+            fixed _OutLine;
+
+            struct a2v{
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+            };
+            struct v2f{
+                float4 pos:SV_POSITION;
+            };
+
+            v2f vert(a2v v){
+                v2f o;
+                o.pos=mul(UNITY_MATRIX_MV,v.vertex);
+                float3 viewNormal=mul((float3x3)UNITY_MATRIX_IT_MV,v.normal);
+                viewNormal.z=-0.5;
+                o.pos=o.pos+float4(normalize(viewNormal),0)*_OutLine;
+                o.pos=mul(UNITY_MATRIX_P,o.pos);
+                return o;
+            }
+
+            fixed4 frag(v2f i):SV_Target{
+                return fixed4(0,0,0,1);
+            }
+
+            ENDCG
+        }
 
 
+        Pass{
+            Tags{"LightMode"="ForwardBase"}
+
+            Cull Back
+
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            
+            #include "UnityCG.cginc"
+            #include "Lighting.cginc"
+            #include "AutoLight.cginc"
+            #include "UnityShaderVariables.cginc"
+
+            fixed4 _Color;
+            float _TileFactor;
+            sampler2D _Hatch0;
+            sampler2D _Hatch1;
+            sampler2D _Hatch2;
+            sampler2D _Hatch3;
+            sampler2D _Hatch4;
+            sampler2D _Hatch5;
+
+            struct a2v{
+                float4 vertex:POSITION;
+                float3 normal:NORMAL;
+                float2 texcoord:TEXCOORD0;
+            };
+
+            struct v2f{
+                float4 pos:SV_POSITION;
+                float2 uv:TEXCOORD0;
+                //hatchWeights0.x到hatchWeights1.y分别对应了6张纹理的权重
+                fixed3 hatchWeights0:TEXCOORD1;
+                fixed3 hatchWeights1:TEXCOORD2;
+                float3 worldPos:TEXCOORD3;
+                SHADOW_COORD(4);
+            };
 
 
+            v2f vert(a2v v){
+                v2f o;
+                o.pos=mul(UNITY_MATRIX_MVP,v.vertex);
+                o.uv=v.texcoord.xy * _TileFactor;
 
+                fixed worldLighDir=normalize(WordSpaceLighdDir(v.vertex));
+                fixed worldNormal=normalize(UnityObjectToWorldNormal(v.normal));
 
+                fixed diff=max(0,dot(worldLighDir,worldNormal));
+                o.hatchWeights0=fixed3(0,0,0);
+                o.hatchWeights1=fixed3(0,0,0);
+                float hatchFactor=diff * 7.0;  //将系数范围扩大到（0,7）,然后等分为7个子区间
 
+                if(hatchFactor>6.0){
+                    //光照中最亮的部分，直接显示为白色
+                }else if（hatchFactor>5.0）{
+                    o.hatchWeights0.x=hatchFactor - 5.0;
+                }else if(hatchFactor>4.0){
+                    o.hatchWeights0.x=hatchFactor - 4.0;
+                    o.hatchWeights0.y= 1 -  o.hatchWeights0.x;
+                }else if(hatchFactor > 3.0){
+                    o.hatchWeights0.y=hatchFactor - 3.0;
+                    o.hatchWeights0.z= 1 - o.hatchWeights0.y;
+                }else if(hatchFactor > 2.0 ){
+                    o.hatchWeights0.z= hatchFactor - 2.0;
+                    o.hatchWeights1.x=1 - o.hatchWeights0.z; 
+                }else if(hatchFactor > 1.0 ){
+                    o.hatchWeights1.x=hatchFactor - 1.0;
+                    o.hatchWeights1.y=1 - o.hatchWeights1.x;
+                }else{
+                    o.hatchWeights1.y=hatchFactor;
+                    o.hatchWeights1.z=1-o.hatchWeights1.y;
+                }
 
+                o.worldPos=mul(_Object2World,v.vertex);
+
+                TRANSFER_SHADOW(o);
+
+                return o;
+            }
+
+            fixed4 frag(v2f i):SV_Target{
+                fixed4 hatchTex0=tex2D(_Hatch0,i.uv) * o.hatchWeights0.x;
+                fixed4 hatchTex1=tex2D(_Hatch1,i.uv) * o.hatchWeights0.y;
+                fixed4 hatchTex2=tex2D(_Hatch2,i.uv) * o.hatchWeights0.z;
+                fixed4 hatchTex3=tex2D(_Hatch3,i.uv) * o.hatchWeights1.x;
+                fixed4 hatchTex4=tex2D(_Hatch4,i.uv) * o.hatchWeights1.y;
+                fixed4 hatchTex5=tex2D(_Hatch5,i.uv) * o.hatchWeights1.z;
+				//只有在为白色（即>,6）的时候，下面的等式才会发挥作用，对应了留白的区域
+                fixed4 whiteColor=fixed4(1,1,1,1) * (1 - o.hatchWeights0.x - o.hatchWeights0.y - o.hatchWeights0.z - o.hatchWeights1.x - o.hatchWeights1.y - o.hatchWeights1.z );
+            
+                fixed4 hatchColor=hatchTex0 + hatchTex1 + hatchTex2 + hatchTex3 + hatchTex4 + hatchTex5 + whiteColor;
+
+                UNITY_LIGHT_ATTENUATION(atten,i,i.worldPos);
+
+                fixed3 finalColor=(_LightColor0.rgb * hatchColor.rgb * atten);
+                retrun fixed4(finalColor,1);
+            }
+            ENDCG
+        }
+    }
+    Fallback "Diffuses"
+}
+```
+
+​	顶点着色器：我们首先对顶点进行了基本的坐标变换。然后，使用_TileFactor得到了纹理采样坐标。在计算6张纹理的混合权重之前，我们首先需要计算逐顶点光照。因此，我们使用世界空间下的光照方向和法线方向得到漫反射系数diff。之后，我们把权重值初始化为0，并把diff缩放到[0, 7]范围，得到hatchFactor。我们把[0, 7]的区间均匀划分为7个子区间，通过判断hatchFactor所处的子区间来计算对应的纹理混合权重。最后，我们计算了顶点的世界坐标，并使用TRANSFER_SHADOW宏来计算阴影纹理的采样坐标。
+
+​	片元着色器：当得到了6六张纹理的混合权重后，我们对每张纹理进行采样并和它们对应的权重值相乘得到每张纹理的采样颜色。我们还计算了纯白在渲染中的贡献度，这是通过从1中减去所有6张纹理的权重来得到的。这是因为素描中往往有留白的部分，因此我们希望在最后的渲染中光照最亮的部分是纯白色的。最后，我们混合了各个颜色值，并和阴影值atten、模型颜色_Color相乘后返回最终的渲染结果。
+
+<br/>
+
+**注意：实际上，根据diff系数的区间来计算权重的时候，每次都只有两张纹理采样的颜色被应用了，其他纹理的权重都为0，即使采样了，最后的颜色也是fixed4（0,0,0,0）。**
+
+```
+注意：
+o.hatchWeights0.x; 对应了第1张纹理
+o.hatchWeights0.y; 对应了第2张纹理
+o.hatchWeights0.z; 对应了第3张纹理
+o.hatchWeights1.x; 对应了第4张纹理
+o.hatchWeights2.y; 对应了第5张纹理
+o.hatchWeights3.z; 对应了第6张纹理
+例如：
+在进行采样时，如果计算的到漫反射系数为5.3，在5 - 6区间，说明这个时候采用了第1张和第2张纹理的颜色，
+并且计算了两张纹理的权重，且这两张纹理权重的和就为1.
+此时：o.hatchWeights0.x=o.3
+	 o.hatchWeights0.y=1- 0.3 =0.7
+其他的都为0，说明采用了两张纹理的颜色值进行混合，而白色部分为0；最后将所有的颜色混合和阴影的参数相乘
+即可。
+
+```
 
 
 
