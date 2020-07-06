@@ -99,3 +99,58 @@ unity shader 入门精要 配套资源github地址：https://github.com/candycat
 
 [Unity3D-Shader-热扭曲效果](https://www.cnblogs.com/lijiajia/p/6861516.html)
 
+
+
+使用脚本将dds贴图转换成png格式的图片：
+
+```c#
+[MenuItem("Assets/一键替换DDS的贴图")]
+    public static void ToChangeMaterialsDDS()
+    {
+        //获取选中目录下的所有Material类型文件对象
+        UnityEngine.Object[] m_objects = Selection.GetFiltered(typeof(Material), SelectionMode.DeepAssets);//选择的所有对象
+        //遍历所有材质
+        foreach (UnityEngine.Object item in m_objects)
+        {
+          
+            if (Path.GetExtension(AssetDatabase.GetAssetPath(item)) != "")//判断路径是否为空
+            {
+                string path = AssetDatabase.GetAssetPath(item);
+                string oldTextruePath = AssetDatabase.GetAssetPath(((Material)item).mainTexture);
+                //判断材质的mainTexture是否为.dds格式
+                if (AssetDatabase.GetAssetPath(((Material)item).mainTexture).Contains(".dds"))
+                {
+                    //如果为.dds格式，获取其同名.png文件路径
+                    string newTextruePath = AssetDatabase.GetAssetPath(((Material)item).mainTexture).Replace(".dds", ".png");
+                    if (Path.GetExtension(newTextruePath) != "")//判断同目录下是否有同名.png文件
+                    {
+                        //则将材质的mainTexture改为转换好的同目录下的.png格式贴图，编辑器模式下使用AssetDatabase.LoadAssetAtPath读取资源
+                        ((Material)item).mainTexture = AssetDatabase.LoadAssetAtPath<Texture>(newTextruePath);
+                        //替换成功后删除.dds格式的贴图文件
+                        AssetDatabase.DeleteAsset(oldTextruePath);
+                        Debug.Log(AssetDatabase.GetAssetPath(item) + "TextureName=" + AssetDatabase.GetAssetPath(((Material)item).mainTexture));
+                    }
+                }
+              
+            }
+
+        }
+        //保存并刷新资源
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+    }
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
