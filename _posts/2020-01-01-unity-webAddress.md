@@ -5,6 +5,12 @@ featured-img: shane-rounce-205187
 categories: [unity, address]
 ---
 
+unity中的UI框架可以学习PureMVC框架
+
+<br/>
+
+<br/>
+
 unity中随机生成地图，像饥荒中的那样，使用   波函数坍缩算法，WFC算法   
 
 

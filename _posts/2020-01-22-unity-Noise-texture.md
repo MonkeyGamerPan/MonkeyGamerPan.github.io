@@ -341,25 +341,124 @@ Shader "Custom/WaterShader"{
 
 ​	为了混合折射和反射颜色，我们随后计算了菲涅耳系数。我们使用之前的公式来计算菲涅耳系数，并据此来混合折射和反射颜色，作为最终的输出颜色。
 
+<br/>
 
+<br/>
 
+<br/>
 
+## 再谈全局雾效（应用于后处理）
 
+​	之前有学过如何使用深度纹理来实现一种基于屏幕后处理的全局雾效。我们由深度纹理重建每个像素在世界空间下的位置，再使用一个基于高度的公式来计算雾效的混合系数，最后使用该系数来混合雾的颜色和原屏幕颜色。前面的实现效果是一个基于高度的均匀雾效，即在同一个高度上，雾的浓度是相同的。然而，一些时候我们希望可以模拟一种不均匀的雾效，同时让雾不断飘动，使雾看起来更加飘渺。而这就可以通过使用一张噪声纹理来实现。
 
+![](../assets/img/resources/FogWithNoiseTexture.png)
 
+<center>左边：均匀雾效，右边：使用噪声纹理后的非均匀雾效</center>
 
+<br/>
 
+Shader示例代码：
 
+```c#
+Shader "Custom/FogWithNoiseTexture"{
+    Properties{
+        _MainTex("Base Texture",2D)="white"{}
+        _NoiseTex("Noise Texture",2D)="white"{}
+        _NoiseAmount("Noise Amount",Float)=1.0
+        _FogSpeedX("NoiseTex X Speed",Float)=0.1
+        _FogSpeedY("NoiseTex Y Speed",Float)=0.1
+        _FogDensity("Fog Density",Float)=1.0
+        _FogColor("Fog Color",Color)=(1,1,1,1)
+        _FogStart("Fog Start",Float)=0.0
+        _FogEnd("Fog End",Float)=1.0
+    }
 
+    SubShader{
+        CGINCLUDE
 
+        #include "UnityCG.cginc"
+       
+        float4x4 _FrustumCornerRay;
+        
+        sampler2D _MainTex;
+        half4 _MainTex_TexelSize;
+        sampler2D _CameraDepthTexture;
+        half _FogDensity;
+        fixed4 _FogColor;
+        float _FogStart;
+        float _FogEnd;
+        sampler2D _NoiseTex;
+        float4 _NoiseTex_ST;
+        half _FogSpeedX;
+        half _FogSpeedY;
+        half _NoiseAmount;
 
+        struct v2f{
+            float4 pos:SV_POSITION;
+            float2 uv:TEXCOORD0;
+            float2 uv_depth:TEXCOORD1;
+            float4 interpolateRay:TEXCOORD2;
+        };
 
+        v2f vert(appdata_img v){
+            v2f o;
+            o.pos=mul(UNITY_MATRIX_MVP,V.vertex);
+            o.uv=v.texcoord;
+            o.uv_depth=v.texcoord;
 
+            //如果图像颠倒，那么纹素的坐标值相反
+            #if UNITY_UV_STARTS_AT_TOP
+                if(_MainTex_TexelSize.y < 0){
+                    _MainTex_TexelSize.y = 1- _MainTex_TexelSize.y;
+                }
+            #endif
+            int index=0;
+            if(v.texcoord.x<0.5 && v.texcoord.y<0.5){
+                    index=0;
+            }else if(v.texcoord.x > 0.5 && v.texcoord.y < 0.5){
+                    index=1;
+            }else if(v.texcoord.x > 0.5 && v.texcoord.y > 0.5){
+                    index=2;
+            }else{
+                    index=3
+            }
+            //如果图像颠倒,interpolateRay对应的索引也颠倒了
+            #if UNITY_UV_STARTS_AT_TOP
+                if(_MainTex_TexelSize.y < 0)
+                    index= 3 - index;
+            #endif
+            o.interpolateRay=_FrustumCornerRay[index];
+            return o;
+        }
 
+        fixed4 frag(v2f i):SV_Target{
+            float depth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture,i.uv_depth));
+            float3 worldPos= _WorldSpaceCameraPos + depth * interpolateRay.xyz;
+            float2 speed = _Time.y * float2(_FogSpeedX,_FogSpeedY);
+            float noise=(tex2D(_NoiseTex,i.uv + speed).r - 0.5) * _NoiseAmount;
+            float fogDensity=(_FogEnd - worldPos.y)/(_FogEnd - _FogStart);
+            fogDensity=saturate(fogDensity * _FogDensity * ( 1 + noise ));
+            fixed4 finalColor=tex2D(_MainTex,i.uv);
+            finalColor=lerp(_FogColor.rgb,finalColor.rgb,fogDensity);
+            return finalColor
+        }   
+        
+        ENDCG
+        Pass{
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
 
+            ENDCG
+        }
+    }
+    Fallback Off
+}
+```
 
+​	我们首先根据深度纹理来重建该像素在世界空间中的位置。然后，我们利用内置的_ Time.y变量和FogXSpeed、FogYSpeed属性计算出当前噪声纹理的偏移量，并据此对噪声纹理进行采样，得到噪声值。我们把该值减去0.5，再乘以控制噪声程度的属性NoiseAmount，得到最终的噪声值。随后，我们把该噪声值添加到雾效浓度的计算中，得到应用噪声后的雾效混合系数fogDensity。最后，我们使用该系数将雾的颜色和原始颜色进行混合后返回。
 
-
+​	
 
 
 
