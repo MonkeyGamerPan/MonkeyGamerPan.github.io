@@ -7,6 +7,10 @@ categories: [unity, shader]
 
 ​	使用Unity写Shader的一个好处在于，它提供了很多内置的参数，这使得我们不再需要自己手动计算一些值。本节将给出Unity内置的用于空间变换和摄像机以及屏幕参数的内置变量。这些内置变量可以在UnityShaderVariables.cginc文件中找到定义和说明。
 
+<br/>
+
+<br/>
+
 ## 内置变量
 
 |      名称       |  类型  |                             描述                             |
@@ -16,7 +20,9 @@ categories: [unity, shader]
 |    _CosTime     | float4 |     t是时间的余弦值，4个分量的值分别是(t/8, t/4, t/2, t)     |
 | unity_DeltaTime | float4 | dt是时间增量，4个分量的值分别是(dt, 1/dt, smoothDt, 1/smoothDt) |
 
+<br/>
 
+<br/>
 
 ## 内置宏
 
@@ -40,7 +46,11 @@ categories: [unity, shader]
 |             SAMPLEDEPTH_TEXTURE_PROJ              | 接受两个参数—深度纹理和一个float3或float4类型的纹理坐标，它的内部使用了tex2Dproj这样的函数进行投影纹理采样，纹理坐标的前两个分量首先会除以最后一个分量，再进行纹理采样。如果提供了第四个分量，还会进行一次比较，通常用于阴影的实现中。SAMPLE_DEPTH_TEXTURE_PROJ的第二个参数通常是由顶点着色器输出插值而得的屏幕坐标。 |
 |             SAMPLE_DEPTH_TEXTURE_LOD              |                                                              |
 
+<br/>
 
+<br/>
+
+<br/>
 
 ## 变换矩阵
 
@@ -79,9 +89,9 @@ float4 modelPos = mul(viewPos, UNITY_MATRIX_IT_MV);
 
 **注意：在进行矩阵变换的时候，不仅仅可以通过使用mul方法来进行矩阵和向量的乘法对向量进行变换，还可以使用矩阵的每一行和向量的点积来作为变换后的向量的分量，如：第一行点积向量作为变换后的向量的x分量，以此类推。**
 
+<br/>
 
-
-
+<br/>
 
 ## unity内置函数
 
@@ -100,7 +110,10 @@ float4 modelPos = mul(viewPos, UNITY_MATRIX_IT_MV);
 |        float3 UnityObjectToWorldNormal (float3 norm)         |             把法线方向从模型空间转换到世界空间中             |
 |          float3 UnityObjectToWorldDir (float3 dir)           |             把方向矢量从模型空间变换到世界空间中             |
 |           float3 UnityWorldToObjectDir(float3 dir)           |             把方向矢量从世界空间变换到模型空间中             |
-|                 ComputeScreenPos(float3 pos)                 | 输入参数pos是经过MVP矩阵变换后在裁剪空间中的顶点坐标,将裁剪空间中的点变换到屏幕空间中的点。使用xy分量再除以w分量才能得到视口空间中的坐标。 |
+|                                                              |                                                              |
+|                 ComputeScreenPos(float3 pos)                 | 输入参数pos是经过MVP矩阵变换后在裁剪空间中的顶点坐标,将裁剪空间中的点变换到屏幕空间中的点。使用xy分量再除以w分量才能得到视口空间中的坐标。<br/>首先对裁剪空间下的坐标进行齐次除法，得到范围在[−1, 1]的NDC，然后再将其映射到范围在[0, 1]的视口空间下的坐标。<br/>ComputeScreenPos的函数名字似乎意味着会直接得到屏幕空间中的位置，但并不是这样的，我们仍需在片元着色器中除以它的w分量来得到真正的视口空间中的位置。 |
+|               ComputeGrabScreenPos(float3 pos)               | 输入参数pos是经过MVP矩阵变换后在裁剪空间中的顶点坐标,此函数得到对应被抓取的屏幕图像的采样坐标 |
+|                                                              |                                                              |
 | DecodeDepthNormal( float4 enc, out float depth, out float3 normal ) | 对使用tex2D采样_CameraDepthNormalsTexture后的结果进行解码处理，得到深度值和法线方向，此深度值是线性深度值，并且是视角空间下的，而且获得的法线方向也是视角空间下的。 |
 |                        LinearEyeDepth                        | 负责把深度纹理的采样结果转换到**视角空间下的线性深度值**,内部使用了_ZBufferParams变量来得到远近裁剪平面的距离。 |
 |                        Linear01Depth                         | 会返回一个范围在[0，1]的**线性深度值**,内部使用了_ZBufferParams变量来得到远近裁剪平面的距离。相当于上面的函数结果除以摄像机Far裁剪平面的值的结果。 |
