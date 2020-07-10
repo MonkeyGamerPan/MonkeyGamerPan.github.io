@@ -38,25 +38,27 @@ categories: [unity, shader]
 
 ## 内置宏
 
-|                       名称                        |                             描述                             |
-| :-----------------------------------------------: | :----------------------------------------------------------: |
-|              UNITY_LIGHT_ATTENUATION              | unity中的内置宏，统一管理unity中的光照衰减和阴影。（即光照衰减atten 乘以 阴影系数） |
-| TANGENT_SPACE_ROTATION（在UnityCG.cginc中被定义） | 使用这个宏可以获得一个 将变量从模型空间变换到切线空间的矩阵rotation； |
-|                                                   |                                                              |
-|                 SHADOW_COORDS（）                 | 阴影接收三剑客其一，声明一个用于对阴影纹理采样的坐标。需要注意的是，这个宏的参数需要是下一个可用的插值寄存器的索引值，此宏的参数中的寄存器索引值由前面的索引值加一，(定义在AutoLight.cginc中) |
-|                TRANSFER_SHADOW（）                | 阴影接受三剑客其二，用于在顶点着色器中计算上一步中声明的阴影纹理坐标。(定义在AutoLight.cginc中) |
-|              SHADOW_ ATTENUATION（）              |  阴影接受三剑客其三，计算阴影值。(定义在AutoLight.cginc中)   |
-|                                                   |                                                              |
-|         TRANSFORM_TEX(v.vertex,_MainTex)          | TRANSFORM_TEX是在UnityCG.cginc中定义的,用于计算<br>o.uv = v.texcoord.xy * _MainTex_ST.xy + _MainTex_ST.zw; |
-|                                                   |                                                              |
-|                 V2F_SHADOW_CASTER                 |     阴影投射使用，写在stuct v2f中，定义在UnityCG.cginc中     |
-|      TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)       |               阴影投射使用，写在vert顶点函数中               |
-|             SHADOW_CASTER_FRAGMENT(i)             |               阴影投射使用，写在frag片元函数中               |
-|                                                   |                                                              |
-|               SAMPLE_DEPTH_TEXTURE                | unity内置宏，用于处理不同平台对深度的差异，直接使用这个宏对深度纹理进行采样。SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv) |
-|           UNITY_PROJ_COORD（i.srcPos）            |                         深度值 [0,1]                         |
-|             SAMPLEDEPTH_TEXTURE_PROJ              | 接受两个参数—深度纹理和一个float3或float4类型的纹理坐标，它的内部使用了tex2Dproj这样的函数进行投影纹理采样，纹理坐标的前两个分量首先会除以最后一个分量，再进行纹理采样。如果提供了第四个分量，还会进行一次比较，通常用于阴影的实现中。SAMPLE_DEPTH_TEXTURE_PROJ的第二个参数通常是由顶点着色器输出插值而得的屏幕坐标。 |
-|             SAMPLE_DEPTH_TEXTURE_LOD              |                                                              |
+|                         名称                          |                             描述                             |
+| :---------------------------------------------------: | :----------------------------------------------------------: |
+|              **UNITY_LIGHT_ATTENUATION**              | unity中的内置宏，统一管理unity中的光照衰减和阴影。（即光照衰减atten 乘以 阴影系数） |
+| **TANGENT_SPACE_ROTATION（在UnityCG.cginc中被定义）** | 使用这个宏可以获得一个 将变量从模型空间变换到切线空间的矩阵rotation； |
+|                                                       |                                                              |
+|                 **SHADOW_COORDS（）**                 | 阴影接收三剑客其一，声明一个用于对阴影纹理采样的坐标。需要注意的是，这个宏的参数需要是下一个可用的插值寄存器的索引值，此宏的参数中的寄存器索引值由前面的索引值加一，(定义在AutoLight.cginc中) |
+|                **TRANSFER_SHADOW（）**                | 阴影接受三剑客其二，用于在顶点着色器中计算上一步中声明的阴影纹理坐标。(定义在AutoLight.cginc中) |
+|              **SHADOW_ ATTENUATION（）**              |  阴影接受三剑客其三，计算阴影值。(定义在AutoLight.cginc中)   |
+|                                                       |                                                              |
+|         **TRANSFORM_TEX(v.vertex,_MainTex)**          | TRANSFORM_TEX是在UnityCG.cginc中定义的,用于计算<br>o.uv = v.texcoord.xy * _MainTex_ST.xy + _MainTex_ST.zw; |
+|                                                       |                                                              |
+|                 **V2F_SHADOW_CASTER**                 |     阴影投射使用，写在stuct v2f中，定义在UnityCG.cginc中     |
+|      **TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)**       |               阴影投射使用，写在vert顶点函数中               |
+|             **SHADOW_CASTER_FRAGMENT(i)**             |               阴影投射使用，写在frag片元函数中               |
+|                                                       |                                                              |
+|               **SAMPLE_DEPTH_TEXTURE**                | unity内置宏，用于处理不同平台对深度的差异，直接使用这个宏对深度纹理进行采样。SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv) |
+|           **UNITY_PROJ_COORD（i.srcPos）**            |                         深度值 [0,1]                         |
+|             **SAMPLEDEPTH_TEXTURE_PROJ**              | 接受两个参数—深度纹理和一个float3或float4类型的纹理坐标，它的内部使用了tex2Dproj这样的函数进行投影纹理采样，纹理坐标的前两个分量首先会除以最后一个分量，再进行纹理采样。如果提供了第四个分量，还会进行一次比较，通常用于阴影的实现中。SAMPLE_DEPTH_TEXTURE_PROJ的第二个参数通常是由顶点着色器输出插值而得的屏幕坐标。 |
+|             **SAMPLE_DEPTH_TEXTURE_LOD**              |                                                              |
+|                                                       |                                                              |
+|                **COMPUTE_EYEDEPTH()**                 | 计算顶点在视角空间中的深度并将其在 o 中输出。当__不__渲染到深度纹理时，在顶点程序中使用此宏。参数可以使用结构体o，也可以使用ComputeScreenPos变换后的点来作为参数 |
 
 <br/>
 

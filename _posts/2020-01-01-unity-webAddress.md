@@ -4,7 +4,19 @@ title: "Unity Web Address"
 featured-img: shane-rounce-205187
 categories: [unity, address]
 ---
+[Unity Shader学习笔记 - 用UV动画实现沙滩上的泡沫](https://blog.csdn.net/ltycloud/article/details/79417637)
 
+<br/>
+
+<br/>
+
+unity中的前段以及后端框架，ET框架和GF框架，都是开源，各有各的优缺点
+<br/>
+<br/>
+unity中的热跟新，现在有使用Lua和ILRuntime框架，
+
+<br/>
+<br/>
 unity中的UI框架可以学习PureMVC框架
 
 <br/>
