@@ -58,7 +58,7 @@ categories: [unity, shader]
 |             **SAMPLEDEPTH_TEXTURE_PROJ**              | 接受两个参数—深度纹理和一个float3或float4类型的纹理坐标，它的内部使用了tex2Dproj这样的函数进行投影纹理采样，纹理坐标的前两个分量首先会除以最后一个分量，再进行纹理采样。如果提供了第四个分量，还会进行一次比较，通常用于阴影的实现中。SAMPLE_DEPTH_TEXTURE_PROJ的第二个参数通常是由顶点着色器输出插值而得的屏幕坐标。 |
 |             **SAMPLE_DEPTH_TEXTURE_LOD**              |                                                              |
 |                                                       |                                                              |
-|                **COMPUTE_EYEDEPTH()**                 | 计算顶点在视角空间中的深度并将其在 o 中输出。当__不__渲染到深度纹理时，在顶点程序中使用此宏。参数可以使用结构体o，也可以使用ComputeScreenPos变换后的点来作为参数 |
+|                **COMPUTE_EYEDEPTH()**                 | 计算顶点在视角空间中的深度并将其在 o 中输出。当不渲染到深度纹理时，在顶点程序中使用此宏。参数可以使用结构体o，也可以使用ComputeScreenPos变换后的点的z分量来作为参数 |
 
 <br/>
 
