@@ -4,6 +4,9 @@ title: "Unity Web Address"
 featured-img: shane-rounce-205187
 categories: [unity, address]
 ---
+[Unity——Bit编程，可用于计算技能解锁\装备购买并初步加密，降低内存占有量并提高安全性](https://blog.csdn.net/Htlas/article/details/79717990)
+<br>
+<br>
 [Unity Shader学习笔记 - 用UV动画实现沙滩上的泡沫](https://blog.csdn.net/ltycloud/article/details/79417637)
 
 <br/>
