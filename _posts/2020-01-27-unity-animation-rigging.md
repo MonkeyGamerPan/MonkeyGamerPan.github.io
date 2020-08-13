@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Unity URP RenderPipeline"
+title: "Unity Animation Rigging"
 featured-img: shane-rounce-205187
 categories: [unity,Animation-Rigging]
 ---
