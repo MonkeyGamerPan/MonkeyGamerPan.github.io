@@ -214,17 +214,19 @@ typedef struct DuLNode{
 
 <br/>
 
+<br/>
 
+### 一元多项式的表示及相加
 
+​	符号多项式的操作，已经成为表处理的典型用例。在数学上，一个一元多项式 P<sub>n</sub>（x）可按照升幂写成：
 
+<center>P<sub>n</sub>（x）=P<sub>0</sub>+ P<sub>1</sub>（x）+P<sub>2</sub>（x<sup>2</sup>）+ ... + P<sub>n</sub>（x<sup>n</sup>）</center>
 
+​	他由 n+1 个系数唯一确定。因此，在计算机里，他可用一个线性表 P 来表示：
 
+<center>P = （P<sub>0</sub>+ P<sub>1</sub> + P<sub>2</sub> + ... + P<sub>n</sub>）</center>
 
-
-
-
-
-
+​	每一项的指数 i 隐含在其系数 P<sub>i</sub> 的序号里。
 
 
 
