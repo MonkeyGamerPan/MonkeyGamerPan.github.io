@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 一些零散的笔记
+title: android MTKLog相关
 featured-img: sleek
 mathjax: true
 categories: note
