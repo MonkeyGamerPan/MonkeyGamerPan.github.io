@@ -318,39 +318,97 @@ How to Send Events:
 GameplayIngredients.Messager.Send("My_Message");
 ```
 
+<br/>
 
+<br/>
 
+## Rigs
 
+​	Gameplay Ingredients内置有一系列的rigs来帮助你定义你的游戏物体的行为。
 
+<br/>
 
+<br/>
 
+## State Machines
 
+​	Gameplay Ingredients实现了一种简单的方法来声明State Machines并且使用Actions来控制
 
+<br/>
 
+### State Machine Component
 
+​	State Machine Component定义了一个State Machine和此state machine的状态。每一个state machine都是以给定的状态开始并且其状态可以随着时间的改变而改变。你可以使用**SetStateAction**来改变state machine的状态到另一个状态。
 
+<br/>
 
+### States
 
+​	States定义了State Machine的一个状态，一个States由持有**State**行为的游戏物体定义的。
 
+​	State Behaviour是由**OnStateEnter** 和 **OnStateExit** 的Callable list组成的。当进入一个状态时，会调用OnSateEnter，退出一个状态时候调用OnStateExit。
 
+<br/>
 
+### Life Cycle Example
 
+​	State Machines 基于当前激活的state来启用其state对象，并且在激活后执行State Enter调用，在禁用前执行State Exit调用。
 
+​	下面以一个状态机为例，它定义了状态a和状态b，并且将状态a设置为默认状态。
 
+​	**At Startup**
 
+- State A becomes Enable
+- State A->OnStateEnter is Called	
 
+<br/>
 
+**A SetStateAction** changes the state to **State B**	
 
+- State A > **OnStateExit** is called
 
+- State A becomes Disabled
+- State B becomes Enabled
+- State B > **OnStateEnter** is called
 
+<br/>
 
+<br/>
 
+<br/>
 
+## Factories
 
+​	Factories 是一个MonoBehavior，它可以从Prefab或者其他游戏对象蓝图来实例化新的游戏对象。Factories处理生成（spawn）（随机，顺序或者从Game Save中生成实例）并且处理实例的数量，而且还支持自动重生。
 
+![](../assets/img/resources/factory.png)
 
+<br/>
 
+### Options
 
+| Name                      | Description                                                  |
+| ------------------------- | ------------------------------------------------------------ |
+| Factory Blueprints        | 作为Spawn（生成）参考的预制件或场景游戏物体的一个集合        |
+| Blueprint Selection Mode  | Enum : 为Spawn选择蓝图所使用的方法，可能的值有Random、Sequential、Shuffle 或者 Game Save |
+| Game Save Location        | 如果Selection Mode指定为Game Save，此项为选择从中读取值的Game Save的位置（System 或者 User） |
+| Game Save Variable Name   | 如果Selection Mode指定为Game Save，此项定义从中读取值的Game Save变量 |
+| Default Game Save Index   | 如果Selection Mode指定为Game Save，Location为User，此项指定要从中读取的User Save的索引 |
+| Spawn Target              | 定义用于生成新实例的目标的Transform                          |
+| Spawn Target Location     | 定义生成新对象的场景和父对象，可能的取值有：**Same Scene as Target**, **Child of Target**, 或者 **DontDestroyOnLoad**（持久运行时场景） |
+| Sacrifice Oldest          | 如果启用此选项，Factories将会销毁最旧的实例以重新生成新的实例。以这种方式销毁最旧的实例不会触发其ReSpawn的调用 |
+| Respawn Target            | 控制是否需要自动重新生成已销毁的实例                         |
+| Respawn Delay             | 如果启动了Respawn Target，控制重新生成实例前的延迟           |
+| Reap Instances on Destroy | 控制在Factories销毁时是否需要销毁实例                        |
+| Max Instances             | 定义管理实例的实例池的容量                                   |
+| On Spawn                  | 生成实例时要调用的Callables列表，Instigators（调用者）是新实例对象 |
+| On Respawn                | 重新生成实例时要调用的Callables列表，Instigator（调用者）是工厂对象 |
+
+<br/>
+
+<br/>
+
+<br/>
 
 
 
