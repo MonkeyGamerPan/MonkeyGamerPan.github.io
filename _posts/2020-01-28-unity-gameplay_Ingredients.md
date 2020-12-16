@@ -410,47 +410,147 @@ GameplayIngredients.Messager.Send("My_Message");
 
 <br/>
 
+## Timers
+
+​	Gameplay Ingredients实现了Timers（计时器），一个可以通过Starting、Stopping或者Resetting控制的脚本。
+
+​	Timers可以在Interruption（中断）、Start 或者 Reset的时候执行Actions。
+
+<br/>
+
+### Using Timers	
+
+​	Timer依赖语Timer 组件，它是一个负责跟踪时间的单一行为。
+
+​	计时器倒计时给定的时间周期，在它到达零之前可以被中断。基于interruption或者completion（完成），可以执行Callables。
+
+​	在计时器使用**TimerAction**的时候是可交互的，此操作可以对给定计时器执行状态更改。
+
+​	![](../assets/img/resources/timer-action.png)
+
+​	Timer Actions可以执行以下操作：
+
+- Interrupt
+- Start
+- Set Time
+
+<br/>
+
+<br/>
+
+<br/>
+
+## Global Variables
+
+Global Variables是一组内存驻留变量（静态变量），存储在游戏会话中，你可以执行和这些变量相关的Actions 和 Logic。
+
+<br/><br/><br/>
+
+## Counters
+
+​	Counters是一个可以保持每个实例的值，以便于用作游戏级别的Logic Counters（逻辑计数器）的一种特殊脚本。
+
+<br/>
+
+### Counter
+
+​	Counter Component是Counters值的主要持有者，它以给定的值初始化，并且可以在游戏过程中更改。
+
+​	它具有一下特性：
+
+- **ValueSource** (enum)：决定储存在counter中的值的来源。
+- Property：组件上设置的属性
+- GlobalVariable：一个全局变量
+- GameSave ： 存储在Game Save Manager中的数据
+- **Value**：（如果ValueSource为Property）计数器的初始值
+- **Game Save Variable Name**:(if Value Source is Game Save) Game Save Manager中保存值的int变量的名字
+- **Game Save Location** ：（if Value Source is Game Save）the location of the Game Save where to look for the name
+- **Global Variable Name** : (if Value Source is Global Variable) the name of the Game Save Manager int Variable that holds the value
+- **Global Scope** : (if Value Source is Global Variable) the location of the Game Save where to look for the name
+- **OnValueChanged** : Called when the value of the counter changes
+
+<br/>
+
+### CounterAction
+
+​	Counter action执行对一个或者多个Counter的数值进行修改
+
+- **Counters** : 需要更改的Counter Component列表
+- **Operation** (enum) : the operation to apply on the counters
+- Set
+- Add
+- Subtract
+- Multiply
+- Divide
+- Modulo
+- **ValueSource** (enum) : determines the source of the value to use for the operation
+- Property : A property set on this CounterAction
+- GlobalVariable : A Global Variable
+- GameSave : A data stored into the game save manager
+- **Value** : (if Value Source is Property) the value to apply to the counter(s).
+- **Game Save Variable Name** : (if Value Source is Game Save) the name of the Game Save Manager int Variable that holds the value
+- **Game Save Location** : (if Value Source is Game Save) the location of the Game Save where to look for the name
+- **Global Variable Name** : (if Value Source is Global Variable) the name of the Global int Variable that holds the value
+- **Global Scope** : (if Value Source is Global Variable) the location of the Global Variable Scope where to look for the variable name
 
 
 
+<br/>
 
+### Counter Logic
 
+Counter Logic执行计数器检查以及根据计算执行调用。
 
+- **Counter**: the counter component to perform the evaluation on.
+- **Evaluation** the test to perform
+- Equal
+- Not Equal
+- Greater
+- Greater Or Equal
+- Less
+- Less Or Equal
+- **ValueSource** (enum) : determines the source of the value to use for the evaluation
+- Property : A property set on this CounterLogic
+- GlobalVariable : A [Global Variable](https://peeweek.readthedocs.io/en/latest/gameplay-ingredients/globals/)
+- GameSave : A data stored into the [game save manager](https://peeweek.readthedocs.io/en/latest/gameplay-ingredients/game-save-manager/)
+- **Value** : (if Value Source is Property) the value to compare to the counter.
+- **Game Save Variable Name** : (if Value Source is Game Save) the name of the Game Save Manager int Variable that holds the value to compare
+- **Game Save Location** : (if Value Source is Game Save) the location of the Game Save where to look for the name to compare
+- **Global Variable Name** : (if Value Source is Global Variable) the name of the Global int Variable that holds the value to compare
+- **Global Scope** : (if Value Source is Global Variable) the location of the Global Variable Scope where to look for the variable name to compare
 
+<br/><br/><br/>
 
+## Interactive
 
+​	Gameplay Ingredients 带有一组Player Controllers的交互工具（interactive tools），Interactive scripts允许根据交互规则设置场景中的interactive user（交互用户）和interactive item（交互项目）
 
+<br/><br/><br/>
 
+## Gameplay Ingredients Settings
 
+​	Gameplay Ingredients Settings是一个可选的，项目范围的设置资产 包含了Gameplay Ingredients的自定义选项。
 
+​	![](../assets/img/resources/settings.png)
 
+<br/>
 
+### Creating Settings
 
+​	你可以通过Welcome Screen窗口中的Setup Wizard创建设置文件，此文件将会位于： **Assets/Resources/** 文件夹。
 
+<br/>
 
+### Settings
 
+| Name                              | Description                                                  |
+| --------------------------------- | ------------------------------------------------------------ |
+| Disable Welcome Screen Auto Start | 完全禁用在启动时显示Welcom Screen窗口的行为                  |
+| Excluded Managers                 | 建议一个排除Manager的列表，列表中的引用的类型将不会在游戏启动时生成。 |
+| Verbose Calls                     | 在执行Callable时启用日志记录。这将对性能产生严重影响，在build 的时候应该禁用这一项 |
+| Allow Update Calls                | 由于每次更新可能很慢，我们不建议每一帧都调用Callables。但是如果你真的需要它，你任然可以激活这个选项 |
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<br/><br/><br/>
 
 
 
