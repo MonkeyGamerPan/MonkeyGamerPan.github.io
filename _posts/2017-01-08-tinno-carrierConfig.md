@@ -387,7 +387,7 @@ cfg->ipol_ans_cfg.ipol_ims_roaming_barring_enable = KAL_FALSE;
 <!--功能：指示该运营商VoLTE是否可用 -->
 <boolean name="carrier_volte_available_bool" value="true"/>
 
-<!--功能：指示该运营商VoWiFi是否可用 -->
+<!--功能：指示该运营商VoWiFi是否可用(VoWiFi==WFC) -->
 <boolean name="carrier_wfc_ims_available_bool" value="true" />
 
 <!--功能：指示该运营商ViLte(视频电话)是否可用 -->

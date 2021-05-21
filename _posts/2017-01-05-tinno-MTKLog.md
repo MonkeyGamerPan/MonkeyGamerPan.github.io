@@ -77,8 +77,21 @@ Line 4202: 03-29 11:25:32.910190 939 949 Iam_finish_activity: [0,198242511,14,co
 
 查看sys_log.log中是否存在触发watch dog的情况，如果存在则需要根据pid到data/anr/watchdog文件夹下查看对应的记录文件并分析原因.
 
+</br>
+#### 7.Watchdog相关Log分析
 
+#####导致SWT的原因
+   线程死锁
+   Binder的server端卡住
+   Native方法执行时间过长
+   SurfaceFlinger卡住
+   Dump时间过长
+   Zygote fork进程时卡住
+   Binder used up
+</br>
+</br>
 
+https://blog.csdn.net/ch853199769/article/details/88244689#t6
 
 
 
